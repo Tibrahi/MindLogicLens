@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindLogicLens | The AI Mind Reader</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/public/style.css">
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
-    
     <script>
         tailwind.config = {
             theme: {
@@ -17,11 +16,14 @@
                         panel: '#0f172a',
                         neon: '#a855f7',
                         cyan: '#06b6d4',
-                        glass: 'rgba(15, 23, 42, 0.7)'
+                        glass: 'rgba(15, 23, 42, 0.8)'
                     },
                     fontFamily: {
                         sans: ['Rajdhani', 'sans-serif'],
                         display: ['Orbitron', 'sans-serif']
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     }
                 }
             }
@@ -32,107 +34,157 @@
 
     <div class="fixed inset-0 pointer-events-none z-0">
         <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
-        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-neon/20 rounded-full blur-[128px]"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan/20 rounded-full blur-[128px]"></div>
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-neon/10 rounded-full blur-[128px] animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan/10 rounded-full blur-[128px] animate-pulse"></div>
     </div>
 
-    <header class="relative z-10 p-6 flex justify-between items-center border-b border-white/10 backdrop-blur-sm">
-        <div class="flex items-center gap-3">
-            <div class="relative w-10 h-10 flex items-center justify-center">
-                <div class="absolute inset-0 bg-neon rounded-full blur-md animate-pulse"></div>
-                <div class="relative w-8 h-8 bg-black rounded-full flex items-center justify-center border border-neon">
-                    <span class="text-lg">👁️</span>
+    <header class="relative z-10 p-6 flex justify-between items-center border-b border-white/5 backdrop-blur-md">
+        <div class="flex items-center gap-4 cursor-pointer" onclick="Game.returnToHome()">
+            <div class="relative w-12 h-12 flex items-center justify-center group">
+                <div class="absolute inset-0 bg-neon rounded-full blur-md opacity-50 group-hover:opacity-100 transition duration-500"></div>
+                <div class="relative w-10 h-10 bg-black rounded-full flex items-center justify-center border border-neon/50 group-hover:border-neon transition">
+                    <span class="text-xl">👁️</span>
                 </div>
             </div>
             <div>
                 <h1 class="font-display font-bold text-2xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan to-neon">MIND LOGIC</h1>
-                <p class="text-[10px] text-gray-400 tracking-[0.3em] uppercase">Cognitive Algorithm Loaded</p>
+                <p class="text-[10px] text-cyan/60 tracking-[0.4em] uppercase">System Online</p>
             </div>
         </div>
         
-        <div class="flex flex-col items-end">
-            <span class="text-xs text-cyan uppercase tracking-wider">Logic XP</span>
-            <span id="xp-display" class="font-display text-2xl font-bold text-white tabular-nums">0000</span>
+        <div class="flex items-center gap-6">
+            <div class="text-right hidden md:block">
+                <span class="text-[10px] text-gray-500 uppercase tracking-wider block">Player Rank</span>
+                <span id="rank-display" class="font-display text-sm text-neon">NOVICE</span>
+            </div>
+            <div class="text-right">
+                <span class="text-[10px] text-cyan uppercase tracking-wider block">Logic XP</span>
+                <span id="xp-display" class="font-display text-2xl font-bold text-white tabular-nums">0000</span>
+            </div>
         </div>
     </header>
 
-    <main id="app" class="relative z-10 flex-1 flex flex-col items-center justify-center p-4 w-full max-w-4xl mx-auto">
+    <main id="app" class="relative z-10 flex-1 flex flex-col items-center justify-center p-4 w-full max-w-5xl mx-auto">
         
-        <section id="scene-home" class="w-full max-w-2xl text-center space-y-8 animate-fade-in">
-            <h2 class="font-display text-3xl md:text-5xl font-bold text-white mb-2">SELECT PROTOCOL</h2>
-            <p class="text-gray-400 mb-8">Choose a logic module to test the system's prediction capabilities.</p>
+        <section id="scene-home" class="w-full h-full flex flex-col items-center justify-center animate-fade-in">
+            <div class="text-center mb-10 space-y-2">
+                <h2 class="font-display text-4xl md:text-6xl font-bold text-white">SELECT PROTOCOL</h2>
+                <p class="text-gray-400">Choose a cognitive algorithm to test the system.</p>
+            </div>
             
-            <div id="level-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
+            <div id="level-grid" class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-left max-h-[60vh] overflow-y-auto pr-2 scrollbar-hide">
                 </div>
+
+            <div class="mt-8 w-full max-w-2xl border-t border-white/10 pt-6 flex justify-center">
+                <button onclick="Game.openBuilder()" class="group flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 rounded-full hover:bg-neon/10 hover:border-neon transition-all">
+                    <span class="text-neon">🛠️</span>
+                    <span class="font-display text-sm tracking-widest group-hover:text-white">GRAND MASTER BUILDER</span>
+                </button>
+            </div>
         </section>
 
-        <section id="scene-game" class="hidden w-full max-w-xl flex flex-col items-center">
+        <section id="scene-game" class="hidden w-full max-w-2xl flex flex-col items-center">
             
-            <div class="w-full bg-glass backdrop-blur-xl border border-white/10 p-1 rounded-2xl shadow-2xl relative overflow-hidden">
+            <div class="w-full bg-glass backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl relative overflow-hidden flex flex-col min-h-[500px]">
                 
-                <div class="h-1 w-full bg-gray-800">
-                    <div id="progress-bar" class="h-full bg-gradient-to-r from-cyan to-neon transition-all duration-500" style="width: 0%"></div>
+                <div class="h-1 w-full bg-gray-900">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-cyan to-neon transition-all duration-500 ease-out" style="width: 0%"></div>
                 </div>
 
-                <div class="p-8 text-center min-h-[400px] flex flex-col justify-between">
+                <div class="p-8 md:p-12 flex-1 flex flex-col justify-between relative z-10">
                     
-                    <div>
-                        <h3 id="game-title" class="font-display text-cyan tracking-widest text-sm uppercase mb-8 opacity-80">PROTOCOL INITIATED</h3>
+                    <div class="flex justify-between items-start">
+                        <h3 id="game-title" class="font-display text-cyan tracking-widest text-sm uppercase opacity-80">PROTOCOL INITIATED</h3>
+                        <button onclick="Game.returnToHome()" class="text-xs text-red-500/50 hover:text-red-400 uppercase tracking-wider transition">Abort</button>
                     </div>
 
-                    <div id="game-instruction-container" class="flex-1 flex flex-col items-center justify-center space-y-6">
-                        <p id="game-instruction" class="text-2xl md:text-3xl font-light leading-snug">
+                    <div id="game-content" class="flex-1 flex flex-col items-center justify-center space-y-8 my-8">
+                        
+                        <p id="game-instruction" class="text-2xl md:text-4xl font-light leading-tight text-center transition-all duration-300 transform">
                             Initializing...
                         </p>
 
-                        <div id="symbol-grid" class="hidden w-full h-64 overflow-y-auto grid grid-cols-5 gap-2 text-sm bg-black/40 p-4 rounded border border-white/5 scrollbar-hide"></div>
+                        <div id="symbol-grid" class="hidden w-full h-64 overflow-y-auto grid grid-cols-5 md:grid-cols-8 gap-2 text-sm bg-black/40 p-4 rounded border border-white/5 scrollbar-hide"></div>
 
-                        <div id="input-area" class="hidden w-full max-w-[200px]">
-                            <input type="number" id="user-input" class="w-full bg-black/50 border-b-2 border-neon text-center font-display text-4xl p-2 focus:outline-none focus:border-cyan transition text-white placeholder-gray-700" placeholder="0">
+                        <div id="input-area" class="hidden w-full max-w-[200px] relative group">
+                            <div class="absolute inset-0 bg-neon/20 blur-xl rounded-full opacity-0 group-focus-within:opacity-100 transition duration-500"></div>
+                            <input type="number" id="user-input" class="relative w-full bg-black/50 border-b-2 border-gray-600 text-center font-display text-5xl p-2 focus:outline-none focus:border-neon text-white placeholder-gray-800 transition-colors" placeholder="?">
                         </div>
 
-                        <div id="binary-area" class="hidden flex gap-4 w-full">
-                            <button id="btn-no" class="flex-1 py-4 bg-red-500/10 border border-red-500/50 hover:bg-red-500/30 text-red-400 font-bold rounded transition">NO</button>
-                            <button id="btn-yes" class="flex-1 py-4 bg-green-500/10 border border-green-500/50 hover:bg-green-500/30 text-green-400 font-bold rounded transition">YES</button>
+                        <div id="binary-area" class="hidden flex gap-6 w-full max-w-md">
+                            <button id="btn-no" class="flex-1 py-6 bg-red-500/5 border border-red-500/30 hover:bg-red-500/20 hover:border-red-500 text-red-400 font-bold text-xl rounded-xl transition-all transform hover:-translate-y-1">NO</button>
+                            <button id="btn-yes" class="flex-1 py-6 bg-green-500/5 border border-green-500/30 hover:bg-green-500/20 hover:border-green-500 text-green-400 font-bold text-xl rounded-xl transition-all transform hover:-translate-y-1">YES</button>
                         </div>
                     </div>
 
-                    <div class="mt-8">
-                        <button id="action-btn" class="group relative w-full py-4 bg-white/5 border border-white/10 hover:border-neon/50 rounded-xl overflow-hidden transition-all duration-300">
-                            <div class="absolute inset-0 w-0 bg-neon/20 transition-all duration-[250ms] ease-out group-hover:w-full"></div>
-                            <span class="relative font-display font-bold tracking-wider group-hover:text-neon transition-colors">PROCEED</span>
+                    <div class="mt-auto">
+                        <button id="action-btn" class="group relative w-full py-5 bg-white/5 border border-white/10 hover:border-neon/50 rounded-xl overflow-hidden transition-all duration-300">
+                            <div class="absolute inset-0 w-0 bg-gradient-to-r from-cyan/20 to-neon/20 transition-all duration-300 ease-out group-hover:w-full"></div>
+                            <span class="relative font-display font-bold tracking-[0.2em] group-hover:text-white transition-colors">PROCEED</span>
                         </button>
                     </div>
                 </div>
+
+                <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-neon/5 rounded-full blur-[80px]"></div>
             </div>
-            
-            <button onclick="Game.returnToHome()" class="mt-6 text-gray-500 hover:text-white text-sm uppercase tracking-widest transition">ABORT MISSION</button>
         </section>
 
-        <section id="scene-result" class="hidden w-full max-w-md text-center relative z-20">
-            <div class="relative mb-8">
-                <div class="absolute inset-0 bg-neon/20 blur-[60px] rounded-full"></div>
-                <div class="relative bg-black/80 border border-neon/50 w-64 h-64 mx-auto rounded-full flex items-center justify-center overflow-hidden">
+        <section id="scene-result" class="hidden w-full max-w-lg text-center relative z-20 animate-fade-in">
+            <div class="relative mb-10">
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan/20 to-neon/20 blur-[80px] rounded-full animate-pulse"></div>
+                <div class="relative bg-deep border border-neon/50 w-72 h-72 mx-auto rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.3)]">
                     <div class="scanner-line"></div>
-                    <span id="final-reveal" class="font-display text-8xl text-white drop-shadow-[0_0_15px_rgba(168,85,247,0.8)]">?</span>
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                    <span id="final-reveal" class="font-display text-9xl text-white drop-shadow-[0_0_15px_rgba(168,85,247,0.8)] scale-110">?</span>
                 </div>
             </div>
 
-            <h2 class="font-display text-3xl font-bold mb-4 text-white">CALCULATION COMPLETE</h2>
+            <h2 class="font-display text-4xl font-bold mb-6 text-white tracking-wide">CALCULATION COMPLETE</h2>
             
-            <div class="bg-white/5 border border-white/10 p-4 rounded-lg text-left mb-8">
-                <p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Logic Log:</p>
-                <div id="logic-explanation" class="font-mono text-sm text-cyan leading-relaxed"></div>
+            <div class="bg-panel border border-white/10 p-6 rounded-xl text-left mb-8 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-neon"></div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Logic Explanation:</p>
+                <div id="logic-explanation" class="font-mono text-sm text-cyan leading-relaxed whitespace-pre-line"></div>
             </div>
 
             <div class="flex gap-4">
-                <button onclick="Game.returnToHome()" class="flex-1 py-3 border border-gray-600 rounded hover:bg-gray-800 transition">MENU</button>
-                <button onclick="Game.restartLevel()" class="flex-1 py-3 bg-neon text-black font-bold rounded hover:bg-white transition">AGAIN</button>
+                <button onclick="Game.returnToHome()" class="flex-1 py-4 border border-white/20 rounded-lg hover:bg-white/10 transition font-display tracking-wider text-sm">MENU</button>
+                <button onclick="Game.restartLevel()" class="flex-1 py-4 bg-neon text-black font-bold rounded-lg hover:bg-white hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] transition font-display tracking-wider text-sm">AGAIN</button>
+            </div>
+        </section>
+
+        <section id="scene-builder" class="hidden w-full max-w-3xl flex flex-col items-center animate-fade-in">
+            <h2 class="font-display text-3xl font-bold mb-2">GRAND MASTER BUILDER</h2>
+            <p class="text-gray-400 mb-8">Design a trick. If 'x' cancels out, the system approves it.</p>
+            
+            <div class="w-full bg-glass border border-white/10 p-6 rounded-xl space-y-4">
+                <div class="flex items-center gap-4 p-4 bg-white/5 rounded border border-white/5">
+                    <span class="text-neon font-mono">STEP 1:</span>
+                    <span class="text-white">User thinks of a number (x)</span>
+                </div>
+                
+                <div id="builder-steps" class="space-y-2">
+                    </div>
+
+                <div class="flex gap-2">
+                    <button onclick="Builder.addOp('add')" class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700 text-sm">+ Add</button>
+                    <button onclick="Builder.addOp('sub')" class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700 text-sm">- Sub</button>
+                    <button onclick="Builder.addOp('mul')" class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700 text-sm">* Mul</button>
+                    <button onclick="Builder.addOp('div')" class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700 text-sm">/ Div</button>
+                </div>
+
+                <div class="pt-4 border-t border-white/10 flex justify-between items-center">
+                    <div id="builder-status" class="text-sm font-mono text-gray-500">Result: x</div>
+                    <div class="flex gap-3">
+                        <button onclick="Game.returnToHome()" class="text-gray-400 hover:text-white text-sm">CANCEL</button>
+                        <button onclick="Builder.testAndSave()" class="bg-neon text-black px-6 py-2 rounded font-bold hover:bg-white transition">TEST & RUN</button>
+                    </div>
+                </div>
             </div>
         </section>
 
     </main>
 
-    <script src="/public/game.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>
