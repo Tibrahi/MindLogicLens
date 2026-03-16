@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* custom scrollbar (invisible but functional) */
+/* custom scrollbar */
 .custom-scroll::-webkit-scrollbar {
     width: 4px;
 }
@@ -58,7 +58,7 @@ input[type=number] {
     backdrop-filter: blur(4px);
 }
 
-/* difficulty badges */
+/* difficulty badge colors */
 .diff-easy { border-left-color: #10b981; }
 .diff-medium { border-left-color: #f59e0b; }
 .diff-hard { border-left-color: #ef4444; }
