@@ -58,8 +58,8 @@ input[type=number] {
     backdrop-filter: blur(4px);
 }
 
-/* difficulty badge colors - now using gold for expert, but we keep the original semantics */
-.diff-easy { border-left-color: #10b981; }  /* green stays */
-.diff-medium { border-left-color: #f59e0b; } /* amber */
-.diff-hard { border-left-color: #ef4444; }   /* red */
-.diff-expert { border-left-color: #FFD700; }  /* gold for expert */
+/* difficulty badge colors - gold for expert */
+.diff-easy { border-left-color: #10b981; }
+.diff-medium { border-left-color: #f59e0b; }
+.diff-hard { border-left-color: #ef4444; }
+.diff-expert { border-left-color: #FFD700; }
