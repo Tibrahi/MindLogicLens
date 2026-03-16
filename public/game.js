@@ -87,7 +87,7 @@ const DB = {
 
 // ==================== LEVEL DEFINITIONS ====================
 const Levels = [
-    { // 0: Mind Reader (Classic)
+    { // 0: Mind Reader
         id: 'mindReader',
         title: 'Mind Reader',
         description: 'Classic algebra illusion',
@@ -138,7 +138,7 @@ const Levels = [
             };
         }
     },
-    { // 2: Pattern Lab (digit root)
+    { // 2: Pattern Lab (digital root)
         id: 'patternLab',
         title: 'Pattern Lab',
         description: 'Digital root mystery',
@@ -229,6 +229,7 @@ const Levels = [
 const Game = {
     xp: 0,
     streak: 0,
+    unlocked: [],
     state: {},
     ui: {},
 
@@ -256,11 +257,10 @@ const Game = {
         // render menu
         this.renderMenu();
 
-        // check for daily
+        // daily check
         const lastDaily = localStorage.getItem('lastDaily');
         const today = new Date().toDateString();
         if (lastDaily !== today) {
-            // enable daily button highlight
             document.querySelector('[onclick="Game.startDaily()"]').classList.add('border-cyan');
         }
     },
@@ -270,7 +270,6 @@ const Game = {
         this.ui['streak-display'].innerText = this.streak;
         document.getElementById('modal-xp').innerText = this.xp;
         document.getElementById('modal-streak').innerText = this.streak;
-        // save profile
         DB.saveProfile({ id:'user', totalXP: this.xp, streak: this.streak, unlockedLevels: this.unlocked });
     },
 
@@ -291,21 +290,32 @@ const Game = {
         }).join('');
     },
 
-    startLevel(index) {
-        if (!this.unlocked.includes(index)) { alert('Complete previous levels first!'); return; }
-        const base = Levels[index];
-        const diff = this.ui['difficulty-select'].value;
-        const dynamic = base.createSteps(diff);
-        const lvl = { ...base, ...dynamic, index };
+    // Unified level starter (accepts index or full level object)
+    startLevel(levelOrIndex) {
+        let lvl;
+        if (typeof levelOrIndex === 'object') {
+            lvl = levelOrIndex;
+            lvl.index = undefined; // mark as custom/daily
+        } else {
+            if (!this.unlocked.includes(levelOrIndex)) {
+                alert('Complete previous levels first!');
+                return;
+            }
+            const base = Levels[levelOrIndex];
+            const diff = this.ui['difficulty-select'].value;
+            const dynamic = base.createSteps(diff);
+            lvl = { ...base, ...dynamic, index: levelOrIndex };
+        }
         this.state = { lvl, step: 0, data: {} };
-
+        const diff = this.ui['difficulty-select'].value;
+        this.ui['game-difficulty-badge'].innerText = diff;
+        this.ui['game-difficulty-badge'].className = `text-[10px] bg-black/50 px-2 py-1 rounded border border-white/10 diff-${diff.toLowerCase()}`;
+        this.ui['game-title'].innerText = lvl.title;
+        
         // reset ui
         ['input-area','binary-area','symbol-grid','detective-area'].forEach(id => this.ui[id].classList.add('hidden'));
         this.ui['action-btn'].classList.remove('hidden');
         this.ui['user-input'].value = '';
-        this.ui['game-title'].innerText = lvl.title;
-        this.ui['game-difficulty-badge'].innerText = diff;
-        this.ui['game-difficulty-badge'].className = `text-[10px] bg-black/50 px-2 py-1 rounded border border-white/10 diff-${diff.toLowerCase()}`;
 
         // special setups
         if (lvl.type === 'symbol') this.generateSymbols();
@@ -384,7 +394,6 @@ const Game = {
             this.finish();
             return;
         }
-        // simple decision tree: ask a property
         let question, check;
         const mid = Math.floor((min+max)/2);
         if (!this.state.data.askedGreater) {
@@ -395,7 +404,6 @@ const Game = {
             question = "Is your number even?";
             check = (ans) => {
                 if (ans) {
-                    // narrow to evens in range (simplified: just adjust min/max heuristically)
                     this.state.data.min = Math.ceil(this.state.data.min/2)*2;
                     this.state.data.max = Math.floor(this.state.data.max/2)*2;
                 } else {
@@ -405,14 +413,13 @@ const Game = {
             };
             this.state.data.askedEven = true;
         } else {
-            // fallback to binary
             question = `Is your number greater than ${mid}?`;
             check = (ans) => ans ? (this.state.data.min = mid+1) : (this.state.data.max = mid);
         }
 
         this.setInstruction(question);
         this.ui['action-btn'].classList.add('hidden');
-        this.ui['binary-area'].classList.remove('hidden'); // reuse yes/no
+        this.ui['binary-area'].classList.remove('hidden');
         const yesHandler = () => {
             check(true);
             this.state.step++;
@@ -434,16 +441,16 @@ const Game = {
         this.state.step = 0;
     },
     runGrandmasterBinary() {
-        this.state.lvl.type = 'binary'; // switch to binary logic
+        this.state.lvl.type = 'binary';
         this.state.data.min = 1;
         this.state.data.max = this.state.lvl.range + this.state.lvl.shift;
-        this.state.step = -1; // reset to binary start
-        this.updateStep(); // will enter binary mode
+        this.state.step = -1;
+        this.updateStep();
     },
 
     // ========== BINARY HANDLER ==========
     handleBinary(yes) {
-        if (this.state.lvl.type === 'detective') return; // already handled via dynamic buttons
+        if (this.state.lvl.type === 'detective') return;
         const { mid } = this.state.data;
         if (yes) this.state.data.min = mid + 1;
         else this.state.data.max = mid;
@@ -479,23 +486,21 @@ const Game = {
             }
         } catch(e) { res = "??"; }
 
-        // award XP (base + difficulty multiplier)
         const diffMult = { Easy: 1, Medium: 2, Hard: 3, Expert: 5 }[this.ui['difficulty-select'].value] || 2;
         const gain = 50 * diffMult;
         this.xp += gain;
         this.streak += 1;
-        // update achievements
         this.checkAchievements();
         this.updateStats();
 
-        // save history
         DB.addHistory({ mode: this.state.lvl.title, score: gain, difficulty: this.ui['difficulty-select'].value });
 
-        // unlock next level (if not already)
-        const nextIdx = this.state.lvl.index + 1;
-        if (nextIdx < Levels.length && !this.unlocked.includes(nextIdx)) {
-            this.unlocked.push(nextIdx);
-            DB.saveProfile({ id:'user', totalXP: this.xp, streak: this.streak, unlockedLevels: this.unlocked });
+        // unlock next level only if this is a standard level (has index)
+        if (typeof this.state.lvl.index === 'number') {
+            const nextIdx = this.state.lvl.index + 1;
+            if (nextIdx < Levels.length && !this.unlocked.includes(nextIdx)) {
+                this.unlocked.push(nextIdx);
+            }
         }
 
         this.switchScene('result');
@@ -515,12 +520,11 @@ const Game = {
     },
 
     checkAchievements() {
-        // predefined achievements
         const cheevos = [
-            { name: 'First Blood', condition: this.xp >= 50, earned: false },
-            { name: 'Streak 5', condition: this.streak >= 5, earned: false },
-            { name: 'Streak 10', condition: this.streak >= 10, earned: false },
-            { name: 'Expert Win', condition: this.ui['difficulty-select'].value === 'Expert' && this.state.lvl, earned: false },
+            { name: 'First Blood', condition: this.xp >= 50 },
+            { name: 'Streak 5', condition: this.streak >= 5 },
+            { name: 'Streak 10', condition: this.streak >= 10 },
+            { name: 'Expert Win', condition: this.ui['difficulty-select'].value === 'Expert' && this.state.lvl },
             { name: 'Builder', condition: false } // set in builder
         ];
         cheevos.forEach(async c => {
@@ -545,7 +549,7 @@ const Game = {
     },
 
     restartLevel() {
-        this.startLevel(this.state.lvl.index);
+        this.startLevel(this.state.lvl.index !== undefined ? this.state.lvl.index : this.state.lvl);
     },
 
     openBuilder() {
@@ -556,7 +560,6 @@ const Game = {
     async startDaily() {
         const today = new Date().toDateString();
         localStorage.setItem('lastDaily', today);
-        // generate a random dynamic level
         const a = Math.floor(Math.random() * 8) + 2;
         const b = Math.floor(Math.random() * 20) + 5;
         const dailyLevel = {
@@ -621,10 +624,8 @@ const Builder = {
                 solve: () => this.calc(0),
                 proof: "Custom User Algorithm"
             };
-            // save to IndexedDB
             await DB.saveCustomPuzzle({ steps: this.steps, constant: this.calc(0), created: Date.now() });
-            // award builder achievement
-            DB.addAchievement({ name: 'Builder', earnedAt: Date.now() });
+            await DB.addAchievement({ name: 'Builder', earnedAt: Date.now() });
             Game.startLevel(customLevel);
         } else { alert("Trick must result in a constant number!"); }
     }
@@ -635,7 +636,6 @@ const ProfileModal = {
     async toggle() {
         const modal = document.getElementById('stats-modal');
         if (modal.classList.contains('hidden')) {
-            // refresh data
             const history = await DB.getHistory(5);
             const achievements = await DB.getAchievements();
             document.getElementById('history-list').innerHTML = history.map(h => 
