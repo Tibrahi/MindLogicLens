@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* custom scrollbar */
+/* custom scrollbar - gold accents */
 .custom-scroll::-webkit-scrollbar {
     width: 4px;
 }
@@ -10,14 +10,14 @@
     background: rgba(255,255,255,0.02);
 }
 .custom-scroll::-webkit-scrollbar-thumb {
-    background: rgba(168,85,247,0.3);
+    background: rgba(255,215,0,0.3);
     border-radius: 4px;
 }
 .custom-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(168,85,247,0.6);
+    background: rgba(255,215,0,0.6);
 }
 
-/* scanner animation */
+/* scanner animation - gold */
 @keyframes scan {
     0% { top: -10%; opacity: 0; }
     20% { opacity: 1; }
@@ -28,8 +28,8 @@
     position: absolute;
     width: 100%;
     height: 4px;
-    background: #a855f7;
-    box-shadow: 0 0 15px #a855f7, 0 0 30px #a855f7;
+    background: #FFD700;
+    box-shadow: 0 0 15px #FFD700, 0 0 30px #FFD700;
     animation: scan 2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
@@ -54,12 +54,12 @@ input[type=number] {
 
 /* glass background */
 .bg-glass {
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(4px);
 }
 
-/* difficulty badge colors */
-.diff-easy { border-left-color: #10b981; }
-.diff-medium { border-left-color: #f59e0b; }
-.diff-hard { border-left-color: #ef4444; }
-.diff-expert { border-left-color: #8b5cf6; }
+/* difficulty badge colors - now using gold for expert, but we keep the original semantics */
+.diff-easy { border-left-color: #10b981; }  /* green stays */
+.diff-medium { border-left-color: #f59e0b; } /* amber */
+.diff-hard { border-left-color: #ef4444; }   /* red */
+.diff-expert { border-left-color: #FFD700; }  /* gold for expert */
