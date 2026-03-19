@@ -154,8 +154,7 @@
                 <p id="logic-explanation" class="font-mono text-sm text-gold/90 leading-relaxed whitespace-pre-line"></p>
             </div>
             <div class="flex gap-4">
-                <button onclick="Game.returnToHome()" class="flex-1 py-3 border border-white/20 rounded hover:bg-white/5 text-light/80 text-sm tracking-wider">MENU</button>
-                <button onclick="Game.restartLevel()" class="flex-1 py-3 bg-gold text-deep font-bold rounded hover:bg-white transition text-sm tracking-wider">PLAY AGAIN</button>
+                <!-- buttons dynamically managed by JS -->
             </div>
         </section>
 
@@ -208,6 +207,7 @@
                             <div class="font-display text-3xl text-gold" id="modal-streak">0</div>
                         </div>
                     </div>
+                    <!-- extra stats (levels + games played) will be injected here by JS -->
                     <div class="mb-6">
                         <h4 class="text-sm text-light/60 mb-2 flex items-center gap-2">🏅 ACHIEVEMENTS</h4>
                         <div id="achievements-list" class="grid grid-cols-2 gap-2 text-xs"></div>
