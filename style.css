@@ -1,27 +1,21 @@
-/* Custom Scrollbars */
+/* Custom Soft Scrollbars */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
 ::-webkit-scrollbar-track {
-    background: #FFFFFF;
-    border-left: 2px solid #000000;
+    background: #F8FAFC;
 }
 ::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
     background: #DC2626;
 }
 
-/* Crisp Sharp Element Shadows */
-.shadow-sharp {
-    box-shadow: 6px 6px 0px 0px #000000;
-}
-
-/* Animations */
-@keyframes pulse-fast {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
-.animate-pulse-fast {
-    animation: pulse-fast 1s infinite;
+/* Glass & Glow Custom Utilities */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
 }
