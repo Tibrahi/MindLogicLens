@@ -1,0 +1,27 @@
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #FFFFFF;
+    border-left: 2px solid #000000;
+}
+::-webkit-scrollbar-thumb {
+    background: #DC2626;
+}
+
+/* Crisp Sharp Element Shadows */
+.shadow-sharp {
+    box-shadow: 6px 6px 0px 0px #000000;
+}
+
+/* Animations */
+@keyframes pulse-fast {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.animate-pulse-fast {
+    animation: pulse-fast 1s infinite;
+}
