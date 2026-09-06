@@ -1,20 +1,16 @@
-// ====================== MINDLOGICLENS v3.0 (ENDLESS EDITION) ======================
-// Dependancy: Requires FontAwesome 6 CDN loaded in your HTML head.
+// ====================== MINDLOGICLENS v3.5 (PURE PROCEDURAL ENGINE) ======================
+// Dependency: Requires FontAwesome 6 CDN loaded in your HTML head.
 
 let state = {
-    xp: 1240,
-    streak: 1,
-    level: 1,
-    score: 0,
+    xp: 0,
     endlessStage: 1,
-    lastPlayDate: "",
     customModules: [],
     history: [],
     achievements: [
         { id: "first", name: "First Read", desc: "Complete initial protocol", icon: "fa-solid fa-bolt", unlocked: false },
         { id: "builder", name: "Architect", desc: "Construct custom sequence", icon: "fa-solid fa-cubes-stacked", unlocked: false },
-        { id: "streak5", name: "Neural Flow", desc: "Reach Stage 5 in Endless Mode", icon: "fa-solid fa-fire", unlocked: false },
-        { id: "expert", name: "Master Mind", desc: "Solve Stage 10+ Endless Protocol", icon: "fa-solid fa-brain", unlocked: false }
+        { id: "stage5", name: "Neural Flow", desc: "Reach Stage 5 in Infinite Mode", icon: "fa-solid fa-fire", unlocked: false },
+        { id: "stage10", name: "Master Mind", desc: "Solve Stage 10+ Infinite Protocol", icon: "fa-solid fa-brain", unlocked: false }
     ],
     modules: []
 };
@@ -33,11 +29,11 @@ const audio = {
 function playSound(sound) {
     if (audio[sound]) {
         audio[sound].currentTime = 0;
-        audio[sound].play().catch(() => {}); // Prevent browser autoplay restrictions from throwing errors
+        audio[sound].play().catch(() => {});
     }
 }
 
-// Visual Effects: Confetti Cannon
+// Visual Effects: Confetti Particles
 function launchConfetti() {
     const canvas = document.createElement("canvas");
     canvas.className = "fixed inset-0 pointer-events-none z-50 w-full h-full";
@@ -82,12 +78,12 @@ function launchConfetti() {
     animate();
 }
 
-// Procedural Continuous Protocol Generator (Infinite Game Logic)
+// Fully Dynamic Random Equation Generator
 function generateProceduralProtocol(stage = 1) {
     const opTypes = ["add", "sub", "mul", "div"];
     const icons = ["fa-microchip", "fa-atom", "fa-network-wired", "fa-diagram-project", "fa-cubes", "fa-dna"];
     
-    // Scale sequence length and values by stage difficulty
+    // Scale sequence length dynamically based on user stage progression
     const stepCount = Math.min(2 + Math.floor(stage / 2), 7);
     const ops = [];
 
@@ -95,9 +91,9 @@ function generateProceduralProtocol(stage = 1) {
         let op = opTypes[Math.floor(Math.random() * opTypes.length)];
         let val;
 
-        if (op === "mul") val = Math.floor(Math.random() * 4) + 2;
+        if (op === "mul") val = Math.floor(Math.random() * 3) + 2;
         else if (op === "div") val = Math.floor(Math.random() * 3) + 2;
-        else if (op === "add" || op === "sub") val = Math.floor(Math.random() * (10 + stage * 2)) + 1;
+        else val = Math.floor(Math.random() * (10 + stage * 2)) + 1;
 
         ops.push({ op, val });
     }
@@ -105,16 +101,16 @@ function generateProceduralProtocol(stage = 1) {
     const diffLabel = stage <= 2 ? "Easy" : stage <= 5 ? "Medium" : stage <= 8 ? "Hard" : "Expert";
 
     return {
-        id: `procedural-stage-${stage}`,
-        name: `Neural Link Stage ${stage}`,
-        desc: `Algorithmic pattern generated at procedural tier ${stage}.`,
+        id: `procedural-gen-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+        name: `Neural Link Tier ${stage}`,
+        desc: `Dynamically compiled pathway sequence with ${stepCount} continuous state transformations.`,
         icon: icons[Math.floor(Math.random() * icons.length)],
         difficulty: diffLabel,
         ops: ops
     };
 }
 
-// Core Math Engines
+// Core Mathematical Functions
 function applyForward(ops, x) {
     let val = Number(x);
     for (let op of ops) {
@@ -148,11 +144,11 @@ function getStepText(op) {
 }
 
 function saveState() {
-    localStorage.setItem("mindlogic_state_v3", JSON.stringify(state));
+    localStorage.setItem("mindlogic_pure_state", JSON.stringify(state));
 }
 
 function loadState() {
-    const saved = localStorage.getItem("mindlogic_state_v3");
+    const saved = localStorage.getItem("mindlogic_pure_state");
     if (saved) {
         try {
             const parsed = JSON.parse(saved);
@@ -163,7 +159,7 @@ function loadState() {
     }
 }
 
-// Main Game Controller
+// Game Controller
 const Game = {
     init() {
         loadState();
@@ -173,7 +169,6 @@ const Game = {
 
     updateDisplays() {
         document.getElementById("xp-display").textContent = state.xp;
-        document.getElementById("streak-display").textContent = state.streak;
     },
 
     populateLevels() {
@@ -181,17 +176,18 @@ const Game = {
         if (!grid) return;
         grid.innerHTML = "";
 
-        // Generate dynamic modules
+        // Dynamically generate random operational protocols
+        const currentTier = Math.max(1, Math.floor(state.xp / 100) + 1);
         state.modules = [
-            generateProceduralProtocol(1),
-            generateProceduralProtocol(3),
-            generateProceduralProtocol(6),
-            generateProceduralProtocol(10)
+            generateProceduralProtocol(currentTier),
+            generateProceduralProtocol(currentTier + 1),
+            generateProceduralProtocol(currentTier + 2),
+            generateProceduralProtocol(currentTier + 4)
         ];
 
         const allMods = [...state.modules, ...state.customModules];
 
-        allMods.forEach((mod, index) => {
+        allMods.forEach((mod) => {
             const card = document.createElement("div");
             card.className = `glass-card rounded-xl p-5 cursor-pointer flex flex-col justify-between group transition-all transform hover:-translate-y-1 hover:shadow-2xl`;
 
@@ -213,7 +209,7 @@ const Game = {
                     <p class="text-slate-400 text-xs leading-relaxed line-clamp-2">${mod.desc}</p>
                 </div>
                 <div class="mt-5 pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs font-mono text-slate-400 group-hover:text-slate-200">
-                    <span>INITIATE PROTOCOL</span>
+                    <span>INITIATE SEQUENCE</span>
                     <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                 </div>
             `;
@@ -229,7 +225,7 @@ const Game = {
     startEndlessMode() {
         playSound("click");
         isEndless = true;
-        state.endlessStage = 1;
+        state.endlessStage = Math.max(1, Math.floor(state.xp / 150) + 1);
         const endlessMod = generateProceduralProtocol(state.endlessStage);
         this.startGame(endlessMod);
     },
@@ -243,7 +239,7 @@ const Game = {
 
         document.getElementById("game-title").textContent = mod.name;
         document.getElementById("game-difficulty-badge").textContent = isEndless ? `INFINITE - STAGE ${state.endlessStage}` : mod.difficulty;
-        document.getElementById("game-instruction").innerHTML = `Select an integer initial value <span class="font-mono text-amber-400">x</span> (1–50), then perform sequence below:`;
+        document.getElementById("game-instruction").innerHTML = `Select an initial value <span class="font-mono text-amber-400">x</span> (1–50), then evaluate sequence below:`;
 
         const stepsContainer = document.getElementById("steps-list");
         stepsContainer.innerHTML = currentOps.map((op, i) => `
@@ -276,7 +272,7 @@ const Game = {
 
         if (rounded < 1 || rounded > 50) {
             playSound("fail");
-            CustomAlert.show("Computed state yields initial x outside bounds (1–50). Check your operations.");
+            CustomAlert.show("Computed state yields initial x outside bounds (1–50). Check arithmetic.");
             return;
         }
 
@@ -301,14 +297,9 @@ const Game = {
 
         document.getElementById("logic-explanation").textContent = expl;
 
-        const xpGain = (isEndless ? state.endlessStage * 30 : 50) * Math.min(state.streak, 5);
+        // Earn XP based dynamically on operation step length and stage difficulty
+        const xpGain = currentOps.length * 20 + (isEndless ? state.endlessStage * 15 : 30);
         state.xp += xpGain;
-
-        const today = new Date().toDateString();
-        if (state.lastPlayDate !== today) {
-            state.streak++;
-            state.lastPlayDate = today;
-        }
 
         state.history.unshift({
             name: isEndless ? `Endless Stage ${state.endlessStage}` : currentModule.name,
@@ -371,7 +362,7 @@ const Game = {
     }
 };
 
-// Builder Module (with Drag-and-Drop)
+// Builder Controller
 const Builder = {
     currentOps: [],
 
@@ -410,7 +401,6 @@ const Builder = {
             const div = document.createElement("div");
             div.className = "flex items-center justify-between bg-slate-900 border border-slate-800 px-3.5 py-2.5 rounded-lg text-xs font-mono cursor-grab active:cursor-grabbing hover:border-amber-500/40 transition shadow-md";
             div.draggable = true;
-            div.dataset.index = i;
 
             div.innerHTML = `
                 <div class="flex items-center gap-3 pointer-events-none">
@@ -421,20 +411,14 @@ const Builder = {
                 <button onclick="Builder.removeStep(${i})" class="text-slate-500 hover:text-rose-400 transition">&times;</button>
             `;
 
-            // Drag and Drop Logic
-            div.addEventListener("dragstart", (e) => {
-                e.dataTransfer.setData("text/plain", i);
-            });
-
+            div.addEventListener("dragstart", (e) => e.dataTransfer.setData("text/plain", i));
             div.addEventListener("dragover", (e) => e.preventDefault());
-
             div.addEventListener("drop", (e) => {
                 e.preventDefault();
                 const fromIndex = parseInt(e.dataTransfer.getData("text/plain"));
-                const toIndex = i;
-                if (fromIndex !== toIndex) {
+                if (fromIndex !== i) {
                     const movedItem = this.currentOps.splice(fromIndex, 1)[0];
-                    this.currentOps.splice(toIndex, 0, movedItem);
+                    this.currentOps.splice(i, 0, movedItem);
                     this.renderSteps();
                 }
             });
@@ -465,7 +449,7 @@ const Builder = {
             const newMod = {
                 id: "custom-" + Date.now(),
                 name: "Protocol #" + (state.customModules.length + 1),
-                desc: "Custom user-architected pathway.",
+                desc: "Custom architected pathway sequence.",
                 icon: "fa-solid fa-gears",
                 difficulty: "Medium",
                 ops: [...this.currentOps]
@@ -482,7 +466,7 @@ const Builder = {
     }
 };
 
-// Neural Profile Modal
+// Profile Telemetry Modal
 const ProfileModal = {
     toggle() {
         playSound("click");
@@ -495,9 +479,7 @@ const ProfileModal = {
         }
 
         modal.classList.remove("hidden");
-
         document.getElementById("modal-xp").textContent = state.xp;
-        document.getElementById("modal-streak").textContent = state.streak;
 
         const achContainer = document.getElementById("achievements-list");
         if (achContainer) {
@@ -537,8 +519,8 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-// Initialization
+// Load Initialization Engine
 window.onload = () => {
     Game.init();
-    console.log("%cMindLogicLens Endless 3D Edition v3.0 Loaded", "color:#f59e0b; font-weight:bold; font-size:14px;");
+    console.log("%cMindLogicLens Pure Procedural System Loaded", "color:#f59e0b; font-weight:bold; font-size:14px;");
 };
