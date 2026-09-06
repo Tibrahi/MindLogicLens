@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-white text-black antialiased">
+<html lang="en" class="h-full bg-slate-50 text-slate-800 antialiased">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS // Cognitive IQ Engine</title>
-    
-    <!-- Dependencies -->
+    <title>Nexus Mind IQ Games Platform</title>
+
+    <!-- Pure CDN Links -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             theme: {
@@ -19,15 +19,14 @@
                     colors: {
                         brand: {
                             red: '#DC2626',
-                            darkRed: '#991B1B',
-                            black: '#000000',
-                            cardBg: '#FFFFFF',
-                            border: '#E5E7EB',
-                            darkBorder: '#000000'
+                            redSoft: '#FEE2E2',
+                            redDark: '#991B1B',
+                            dark: '#0F172A',
+                            accent: '#2563EB'
                         }
                     },
                     fontFamily: {
-                        sans: ['Space Grotesk', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace']
                     }
                 }
@@ -36,36 +35,42 @@
     </script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="h-screen w-screen bg-white text-black font-sans flex flex-col justify-between overflow-hidden select-none">
+<body class="h-screen w-screen bg-slate-50 text-slate-800 font-sans flex flex-col justify-between overflow-hidden select-none">
 
-    <!-- Header Navigation -->
-    <header class="border-b-2 border-black bg-white px-6 py-4 flex justify-between items-center z-40">
+    <!-- Soft Company Navigation Header -->
+    <header class="border-b border-slate-200 bg-white/90 backdrop-blur-md px-8 py-4 flex justify-between items-center z-40 shadow-sm">
         <div class="flex items-center gap-3 cursor-pointer" onclick="App.navigate('game')">
-            <div class="w-9 h-9 bg-black flex items-center justify-center font-bold text-white text-xl">N</div>
-            <span class="font-bold tracking-widest text-xl text-black">NEXUS <span class="text-brand-red text-xs font-mono">// IQ ENGINE</span></span>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-red to-red-500 flex items-center justify-center font-bold text-white text-xl shadow-md shadow-red-200">
+                <i class="fa-solid fa-brain text-lg"></i>
+            </div>
+            <div>
+                <span class="font-bold tracking-tight text-lg text-slate-900 block leading-none">NEXUS <span class="text-brand-red">ANALYTICS</span></span>
+                <span class="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Cognitive Evaluation Platform</span>
+            </div>
         </div>
 
         <div id="nav-controls" class="hidden flex items-center gap-6">
-            <!-- Dual Layout Toggle -->
-            <div class="flex border-2 border-black rounded-none bg-white p-0.5">
-                <button onclick="App.setLayout('card')" id="btn-layout-card" class="px-3 py-1 text-xs font-mono font-bold bg-black text-white">CARD VIEW</button>
-                <button onclick="App.setLayout('split')" id="btn-layout-split" class="px-3 py-1 text-xs font-mono font-bold text-black hover:text-brand-red">SPLIT VIEW</button>
+            <!-- Dual Layout Switcher -->
+            <div class="flex border border-slate-200 rounded-lg bg-slate-100 p-1 text-xs font-medium">
+                <button onclick="App.setLayout('card')" id="btn-layout-card" class="px-3 py-1.5 rounded-md font-semibold bg-white text-slate-800 shadow-sm transition">Card View</button>
+                <button onclick="App.setLayout('split')" id="btn-layout-split" class="px-3 py-1.5 rounded-md font-semibold text-slate-500 hover:text-slate-800 transition">Split View</button>
             </div>
 
             <!-- Global Score Indicator -->
-            <div class="flex items-center gap-2 border-2 border-black bg-white px-4 py-1.5 font-mono">
-                <span class="text-xs text-gray-600 uppercase font-bold">PTS:</span>
-                <span id="global-score" class="text-brand-red font-bold text-base">0 PT</span>
+            <div class="flex items-center gap-2 border border-red-100 bg-red-50/60 px-4 py-1.5 rounded-lg">
+                <i class="fa-solid fa-award text-brand-red text-sm"></i>
+                <span class="text-xs text-slate-500 font-medium uppercase">Score:</span>
+                <span id="global-score" class="text-brand-red font-mono font-bold text-base">100 PT</span>
             </div>
 
             <!-- Navigation Links -->
-            <button onclick="App.navigate('records')" class="text-xs font-mono font-bold text-black hover:text-brand-red flex items-center gap-2 border-2 border-black px-3 py-1.5 uppercase">
-                <i class="fa-solid fa-database"></i> Records
+            <button onclick="App.navigate('records')" class="text-xs font-semibold text-slate-600 hover:text-brand-red flex items-center gap-2 border border-slate-200 bg-white px-3.5 py-2 rounded-lg shadow-sm transition">
+                <i class="fa-solid fa-chart-line text-slate-400"></i> Performance Log
             </button>
             
-            <div class="flex items-center gap-3 border-l-2 border-black pl-4">
-                <span id="user-display" class="text-xs font-mono uppercase font-bold text-black">--</span>
-                <button onclick="Auth.logout()" class="text-xs font-mono text-brand-red hover:underline font-bold uppercase"><i class="fa-solid fa-power-off"></i></button>
+            <div class="flex items-center gap-3 border-l border-slate-200 pl-4">
+                <span id="user-display" class="text-xs font-bold text-slate-700 uppercase">--</span>
+                <button onclick="Auth.logout()" class="text-xs text-slate-400 hover:text-brand-red transition"><i class="fa-solid fa-right-from-bracket"></i></button>
             </div>
         </div>
     </header>
@@ -73,124 +78,136 @@
     <!-- Main View Area -->
     <main id="app-viewport" class="flex-1 w-full h-full relative overflow-hidden">
 
-        <!-- 1. SPLIT 2-COLUMN FULLSCREEN AUTHENTICATION -->
+        <!-- 1. SPLIT 2-COLUMN FULLSCREEN AUTHENTICATION PAGE -->
         <section id="view-auth" class="w-full h-full grid grid-cols-1 md:grid-cols-2">
-            <!-- Left Panel: Branding & Protocol Information -->
-            <div class="bg-black text-white p-12 flex flex-col justify-between border-r-4 border-brand-red h-full">
-                <div>
-                    <div class="inline-block px-3 py-1 bg-brand-red text-white text-xs font-mono font-bold mb-6 uppercase">SYSTEM CLEARANCE</div>
-                    <h1 class="text-5xl font-bold tracking-tight mb-4">NON-MATH<br><span class="text-brand-red">IQ EVALUATION</span></h1>
-                    <p class="text-gray-400 text-sm max-w-md leading-relaxed font-mono">
-                        Test visual logic, spatial rotations, anomaly detection, and sequence rules. Earn +20 PT per cleared level. Skipping costs -10 PT. Reaching 0 PT triggers a system knockout.
+            <!-- Left Column: Modern Corporate Presentation -->
+            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-black text-white p-12 flex flex-col justify-between h-full relative overflow-hidden">
+                <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-brand-red/20 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-red-300 text-xs font-mono font-medium mb-8">
+                        <i class="fa-solid fa-shield-check text-brand-red"></i> Verified Assessment Portal
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 leading-tight">
+                        Sequential Logic & <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-amber-300">Mathematical Reasoning</span>
+                    </h1>
+                    <p class="text-slate-300 text-sm max-w-md leading-relaxed">
+                        Evaluate numerical patterns and sequential logic in a structured assessment environment. Earn +20 PT per correct sequence. Skips deduct -10 PT. Reaching 0 PT triggers evaluation reset.
                     </p>
                 </div>
                 
-                <div class="border-t border-gray-800 pt-6">
-                    <div class="flex items-center gap-4 text-xs font-mono text-gray-400">
-                        <span><i class="fa-solid fa-shield-halved text-brand-red"></i> STAGE LOOPING</span>
-                        <span><i class="fa-solid fa-bolt text-brand-red"></i> NO MATH ENGINE</span>
+                <div class="relative z-10 border-t border-slate-700/60 pt-6">
+                    <div class="flex items-center gap-6 text-xs font-mono text-slate-400">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-calculator text-brand-red"></i> Standard Math</span>
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-arrow-trend-up text-brand-red"></i> Realtime Score</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Panel: Interactive Authorization Form -->
-            <div class="bg-white p-12 flex flex-col justify-center items-center h-full">
-                <div class="w-full max-w-md border-2 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
-                    <div class="flex justify-between items-center border-b-2 border-black pb-3 mb-6">
-                        <span class="text-xs font-mono font-bold text-brand-red uppercase">IDENTITY ACCESS</span>
-                        <span id="auth-page-indicator" class="text-xs font-mono font-bold text-black">PAGE 1 / 2</span>
+            <!-- Right Column: Interactive 2-Page Paginated Form -->
+            <div class="bg-slate-50 p-8 md:p-12 flex flex-col justify-center items-center h-full">
+                <div class="w-full max-w-md bg-white border border-slate-200/80 rounded-2xl p-8 shadow-xl shadow-slate-200/50">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+                        <span class="text-xs font-bold text-brand-red uppercase tracking-wider font-mono">Operator Authentication</span>
+                        <span id="auth-page-indicator" class="text-xs font-mono text-slate-400 font-semibold">Page 1 of 2</span>
                     </div>
 
-                    <!-- Auth Form Page 1: Codename Entry -->
-                    <div id="auth-page-1" class="auth-page">
-                        <label class="block text-xs font-mono font-bold uppercase mb-2">Operator Codename</label>
-                        <input id="auth-username" type="text" placeholder="e.g. VECTOR_01" class="w-full bg-white border-2 border-black p-3 text-sm font-mono text-black focus:outline-none focus:border-brand-red mb-6 uppercase font-bold">
-                        <button onclick="Auth.nextPage(2)" class="w-full py-3 bg-black text-white font-bold text-xs font-mono uppercase tracking-wider hover:bg-brand-red transition">PROCEED TO SECURITY KEY →</button>
-                    </div>
-
-                    <!-- Auth Form Page 2: Security Assessment -->
-                    <div id="auth-page-2" class="auth-page hidden">
-                        <label class="block text-xs font-mono font-bold uppercase mb-2">Security Verification</label>
-                        <p class="text-xs text-gray-600 mb-4 font-mono">Which geometry does not belong in standard planar space?</p>
-                        <div class="space-y-2 mb-6 font-mono text-xs">
-                            <button onclick="Auth.selectAnswer(this, 'A')" class="auth-opt w-full text-left p-3 border-2 border-black hover:bg-black hover:text-white transition font-bold">A) CIRCLE</button>
-                            <button onclick="Auth.selectAnswer(this, 'B')" class="auth-opt w-full text-left p-3 border-2 border-black hover:bg-black hover:text-white transition font-bold">B) SQUARE</button>
-                            <button onclick="Auth.selectAnswer(this, 'C')" class="auth-opt w-full text-left p-3 border-2 border-black hover:bg-black hover:text-white transition font-bold">C) HYPERCUBE</button>
+                    <!-- Auth Page 1: Codename Entry -->
+                    <div id="auth-page-1" class="auth-page space-y-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">Candidate Identifier</label>
+                            <input id="auth-username" type="text" placeholder="e.g. ALEX_OPERATOR" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red transition">
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="Auth.nextPage(1)" class="w-1/3 py-3 border-2 border-black font-mono font-bold text-xs uppercase">BACK</button>
-                            <button onclick="Auth.complete()" class="w-1/2 flex-1 py-3 bg-brand-red text-white font-mono font-bold text-xs uppercase hover:bg-black transition">AUTHENTICATE</button>
+                        <button onclick="Auth.nextPage(2)" class="w-full py-3.5 bg-slate-900 text-white rounded-xl font-semibold text-xs uppercase tracking-wider hover:bg-brand-red transition shadow-lg shadow-slate-900/20">
+                            Continue to Security Question →
+                        </button>
+                    </div>
+
+                    <!-- Auth Page 2: Mathematical Baseline Check -->
+                    <div id="auth-page-2" class="auth-page hidden space-y-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Baseline Arithmetic Check</label>
+                            <p class="text-xs text-slate-500 mb-3">Which value completes the basic linear progression: 3, 6, 9, __?</p>
+                            <div class="space-y-2 font-mono text-xs">
+                                <button onclick="Auth.selectAnswer(this, '10')" class="auth-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-brand-red hover:bg-red-50/50 transition font-semibold">A) 10</button>
+                                <button onclick="Auth.selectAnswer(this, '12')" class="auth-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-brand-red hover:bg-red-50/50 transition font-semibold">B) 12 (Correct)</button>
+                                <button onclick="Auth.selectAnswer(this, '15')" class="auth-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-brand-red hover:bg-red-50/50 transition font-semibold">C) 15</button>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 pt-2">
+                            <button onclick="Auth.nextPage(1)" class="w-1/3 py-3 border border-slate-200 text-slate-600 rounded-xl font-semibold text-xs uppercase">Back</button>
+                            <button onclick="Auth.complete()" class="w-2/3 py-3 bg-brand-red text-white rounded-xl font-semibold text-xs uppercase hover:bg-red-700 transition shadow-lg shadow-red-500/20">Complete Auth</button>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 2. GAME MATRIX SECTION -->
-        <section id="view-game" class="w-full h-full hidden flex flex-col justify-between p-6 md:p-8 max-w-6xl mx-auto overflow-y-auto">
-            <!-- Stage Controls Header -->
-            <div class="flex justify-between items-center border-b-2 border-black pb-4 mb-6">
+        <!-- 2. SEQUENTIAL MATHEMATICAL ASSESSMENT MATRIX -->
+        <section id="view-game" class="w-full h-full hidden flex flex-col justify-between p-6 md:p-10 max-w-5xl mx-auto overflow-y-auto">
+            <!-- Header Level Controls -->
+            <div class="flex justify-between items-center border-b border-slate-200 pb-5 mb-6">
                 <div>
-                    <span class="text-xs font-mono font-bold text-brand-red uppercase">ACTIVE STAGE EVALUATION</span>
-                    <h2 id="level-display-title" class="text-3xl font-bold uppercase tracking-tight">STAGE 1</h2>
+                    <span class="text-xs font-mono font-bold text-brand-red uppercase tracking-wider">Active Evaluation Stage</span>
+                    <h2 id="level-display-title" class="text-3xl font-extrabold text-slate-900 tracking-tight">Stage 1</h2>
                 </div>
-                <div class="flex items-center gap-4">
-                    <button onclick="App.skipLevel()" class="px-4 py-2 border-2 border-brand-red bg-white text-brand-red font-mono font-bold text-xs uppercase hover:bg-brand-red hover:text-white transition">
-                        <i class="fa-solid fa-forward"></i> SKIP (-10 PT)
-                    </button>
-                </div>
+                <button onclick="App.skipLevel()" class="px-4 py-2 border border-red-200 bg-red-50 text-brand-red rounded-xl font-semibold text-xs uppercase hover:bg-brand-red hover:text-white transition shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-forward"></i> Skip Level (-10 PT)
+                </button>
             </div>
 
             <!-- Dynamic Layout Container -->
             <div id="game-layout-container" class="flex-1 flex flex-col justify-center">
-                <!-- RENDERED BY APP.JS -->
+                <!-- Dynamically Renders Card View or Split View -->
             </div>
         </section>
 
-        <!-- 3. RECORDS KEEPING SECTION -->
-        <section id="view-records" class="w-full h-full hidden p-6 md:p-8 max-w-5xl mx-auto overflow-y-auto">
-            <div class="flex justify-between items-center border-b-2 border-black pb-4 mb-6">
+        <!-- 3. PERFORMANCE RECORDS PAGE -->
+        <section id="view-records" class="w-full h-full hidden p-6 md:p-10 max-w-4xl mx-auto overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-5 mb-6">
                 <div>
-                    <h2 class="text-3xl font-bold uppercase">PERFORMANCE RECORDS LOG</h2>
-                    <p class="text-xs text-gray-600 font-mono">Historical logging of level transitions and points allocation.</p>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Assessment Performance Log</h2>
+                    <p class="text-xs text-slate-500 font-mono">Real-time telemetry of points accumulation, stage clears, and skips.</p>
                 </div>
-                <button onclick="App.navigate('game')" class="px-4 py-2 bg-black text-white font-mono font-bold text-xs uppercase hover:bg-brand-red transition">RETURN TO MATRIX</button>
+                <button onclick="App.navigate('game')" class="px-4 py-2 bg-slate-900 text-white rounded-xl font-semibold text-xs uppercase hover:bg-brand-red transition shadow-sm">
+                    Return to Assessment
+                </button>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                    <div class="text-xs font-mono font-bold text-gray-500 uppercase">CURRENT SCORE</div>
-                    <div id="record-score" class="text-4xl font-mono font-bold text-brand-red mt-2">0 PT</div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <div class="text-xs font-mono font-bold text-slate-400 uppercase">Current Balance</div>
+                    <div id="record-score" class="text-3xl font-mono font-extrabold text-brand-red mt-2">100 PT</div>
                 </div>
-                <div class="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                    <div class="text-xs font-mono font-bold text-gray-500 uppercase">HIGHEST STAGE</div>
-                    <div id="record-stage" class="text-4xl font-mono font-bold text-black mt-2">STAGE 1</div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <div class="text-xs font-mono font-bold text-slate-400 uppercase">Current Stage</div>
+                    <div id="record-stage" class="text-3xl font-mono font-extrabold text-slate-900 mt-2">Stage 1</div>
                 </div>
-                <div class="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                    <div class="text-xs font-mono font-bold text-gray-500 uppercase">TOTAL CLEARED</div>
-                    <div id="record-count" class="text-4xl font-mono font-bold text-black mt-2">0</div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <div class="text-xs font-mono font-bold text-slate-400 uppercase">Completed Tasks</div>
+                    <div id="record-count" class="text-3xl font-mono font-extrabold text-slate-900 mt-2">0</div>
                 </div>
             </div>
 
-            <div class="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <h3 class="text-xs font-mono font-bold uppercase text-brand-red mb-4">SYSTEM LOG HISTORY</h3>
-                <div id="records-list" class="space-y-2 max-h-60 overflow-y-auto font-mono text-xs">
-                    <!-- Dynamic logs inserted here -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-xs font-mono font-bold uppercase text-brand-red mb-4">Historical Activity Logs</h3>
+                <div id="records-list" class="space-y-2.5 max-h-60 overflow-y-auto font-mono text-xs">
+                    <!-- Dynamic Log Items Inserted Here -->
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Modal Alert Overlay -->
-    <div id="custom-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white border-4 border-black p-6 max-w-sm w-full text-center shadow-[8px_8px_0px_0px_rgba(220,38,38,1)]">
+    <!-- Modal Notification System -->
+    <div id="custom-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
             <div id="modal-icon" class="text-4xl text-brand-red mb-3"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <p id="modal-msg" class="text-sm font-mono font-bold text-black mb-6 uppercase"></p>
-            <button onclick="App.closeModal()" class="w-full py-2 bg-black text-white font-mono font-bold text-xs uppercase hover:bg-brand-red transition">ACKNOWLEDGE</button>
+            <p id="modal-msg" class="text-sm font-semibold text-slate-800 mb-6 uppercase"></p>
+            <button onclick="App.closeModal()" class="w-full py-2.5 bg-slate-900 text-white rounded-xl font-semibold text-xs uppercase hover:bg-brand-red transition">Acknowledge</button>
         </div>
     </div>
 
-    <!-- External Modular JS -->
+    <!-- Script Import -->
     <script src="app.js"></script>
 </body>
 </html>
