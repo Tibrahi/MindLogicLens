@@ -83,13 +83,18 @@
             100% { top: 100%; opacity: 0; }
         }
 
-        /* Number Input Reset */
+        /* Standardized Property Reset to resolve diagnostic CSS linter warning */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
             -webkit-appearance: none; 
+            appearance: none;
             margin: 0; 
         }
-        input[type=number] { -moz-appearance: textfield; }
+        input[type=number] { 
+            -webkit-appearance: textfield;
+            -moz-appearance: textfield; 
+            appearance: textfield;
+        }
     </style>
 </head>
 <body class="h-full bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden select-none">
