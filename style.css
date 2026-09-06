@@ -14,7 +14,7 @@
     background: #DC2626;
 }
 
-/* Glass & Glow Custom Utilities */
+/* Glass panel utility */
 .glass-panel {
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
