@@ -1,821 +1,523 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-950 text-slate-100 antialiased">
+<html lang="en" class="h-full bg-black text-white antialiased">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindLogicLens · Neural Architecture</title>
+    <title>NEXUS // Infinite IQ Matrix</title>
     
     <!-- Dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
                     colors: {
                         brand: {
-                            50: '#fffbeb',
-                            100: '#fef3c7',
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                            600: '#d97706',
+                            red: '#FF003C',
+                            darkRed: '#990024',
+                            black: '#0A0A0A',
+                            cardBg: '#121212',
+                            border: '#262626'
                         }
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
                     }
                 }
             }
         }
     </script>
+    
     <style>
-        /* Modern Glassmorphism & UI Accents */
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.4);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .glass-card:hover {
-            background: rgba(30, 41, 59, 0.7);
-            border-color: rgba(245, 158, 11, 0.3);
-            transform: translateY(-2px);
-        }
-        .custom-scroll::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.6);
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 9999px;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb:hover {
-            background: rgba(245, 158, 11, 0.5);
-        }
-        
-        /* Precision Scanner Overlay */
-        .scanner-beam {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #f59e0b, transparent);
-            box-shadow: 0 0 15px #f59e0b;
-            animation: scan 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        }
-        @keyframes scan {
-            0% { top: 0%; opacity: 0; }
-            15% { opacity: 1; }
-            85% { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
-        }
-
-        /* Standardized Property Reset to resolve diagnostic CSS linter warning */
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            appearance: none;
-            margin: 0; 
-        }
-        input[type=number] { 
-            -webkit-appearance: textfield;
-            -moz-appearance: textfield; 
-            appearance: textfield;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0A0A0A; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #FF003C; }
+        .glow-red { box-shadow: 0 0 15px rgba(255, 0, 60, 0.4); }
+        .border-red-glow { border-color: #FF003C; box-shadow: 0 0 10px rgba(255, 0, 60, 0.2); }
     </style>
 </head>
-<body class="h-full bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden select-none">
+<body class="h-full bg-black text-white font-sans flex flex-col justify-between select-none overflow-x-hidden">
 
-    <!-- Dynamic Ambient Background -->
-    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div class="absolute -top-[20%] -left-[10%] w-[50vw] h-[50vw] bg-brand-500/10 rounded-full blur-[140px]"></div>
-        <div class="absolute -bottom-[20%] -right-[10%] w-[50vw] h-[50vw] bg-blue-600/10 rounded-full blur-[140px]"></div>
-        <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b0a_1px,transparent_1px),linear-gradient(to_bottom,#1e293b0a_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
-    </div>
-
-    <!-- Application Bar -->
-    <header class="relative z-20 h-16 border-b border-slate-800/80 glass-panel px-4 lg:px-8 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-3 cursor-pointer group" onclick="Game.returnToHome()">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-slate-950 font-bold text-lg shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
-                <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <span class="font-bold tracking-tight text-base text-slate-100">MIND LOGIC</span>
-                    <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20">PRO v2.4</span>
-                </div>
-                <p class="text-[11px] text-slate-400 font-medium">Neural Logic Core</p>
-            </div>
+    <!-- Top Navigation Header -->
+    <header class="border-b border-brand-border bg-black/90 px-6 py-4 flex justify-between items-center z-40">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="App.navigate('dashboard')">
+            <div class="w-8 h-8 bg-brand-red flex items-center justify-center font-bold text-black text-xl">N</div>
+            <span class="font-bold tracking-widest text-lg text-white">NEXUS <span class="text-brand-red text-xs font-mono">// IQ ENGINE</span></span>
         </div>
 
-        <div class="flex items-center gap-3 lg:gap-6">
-            <!-- Filter Dropdown -->
-            <div class="relative hidden sm:block">
-                <select id="difficulty-select" onchange="Game.filterModules()" 
-                        class="bg-slate-900 border border-slate-700/80 text-slate-300 text-xs rounded-lg px-3 py-1.5 font-mono focus:outline-none focus:border-brand-500 transition cursor-pointer appearance-none pr-8">
-                    <option value="all">ALL PROTOCOLS</option>
-                    <option value="Easy">EASY PROTOCOLS</option>
-                    <option value="Medium" selected>MEDIUM PROTOCOLS</option>
-                    <option value="Hard">HARD PROTOCOLS</option>
-                    <option value="Expert">EXPERT PROTOCOLS</option>
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </div>
+        <div id="nav-controls" class="hidden flex items-center gap-6">
+            <!-- Layout Switcher -->
+            <div class="flex border border-brand-border rounded bg-brand-cardBg p-1">
+                <button onclick="App.setLayout('card')" id="btn-layout-card" class="px-3 py-1 text-xs font-mono rounded bg-brand-red text-black font-bold">CARD VIEW</button>
+                <button onclick="App.setLayout('split')" id="btn-layout-split" class="px-3 py-1 text-xs font-mono rounded text-white hover:text-brand-red">SPLIT VIEW</button>
             </div>
 
-            <!-- Telemetry Badges -->
-            <div class="flex items-center gap-2 bg-slate-900/80 border border-slate-800 rounded-lg px-3 py-1">
-                <div class="flex items-center gap-1.5 border-r border-slate-800 pr-3">
-                    <span class="text-[10px] font-mono uppercase text-slate-400">XP</span>
-                    <span id="xp-display" class="font-mono text-sm font-bold text-brand-400">0</span>
-                </div>
-                <div class="flex items-center gap-1.5 pl-1">
-                    <span class="text-xs">🔥</span>
-                    <span id="streak-display" class="font-mono text-sm font-bold text-slate-200">0</span>
-                </div>
+            <!-- Score Badge -->
+            <div class="flex items-center gap-2 border border-brand-red/50 bg-brand-cardBg px-3 py-1 rounded">
+                <span class="text-xs font-mono text-gray-400">SCORE:</span>
+                <span id="global-score" class="text-brand-red font-mono font-bold text-sm">0 PT</span>
             </div>
 
-            <button onclick="ProfileModal.toggle()" 
-                    class="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white transition active:scale-95"
-                    title="Neural Profile">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <!-- User Info & Records Link -->
+            <button onclick="App.navigate('records')" class="text-xs font-mono text-white hover:text-brand-red flex items-center gap-2 border border-brand-border px-3 py-1 rounded">
+                <i class="fa-solid fa-database"></i> RECORDS
             </button>
+            <span id="user-display" class="text-xs font-mono uppercase text-gray-400 border-l border-brand-border pl-4">--</span>
         </div>
     </header>
 
-    <!-- Main Workspace -->
-    <main id="app" class="relative z-10 flex-1 flex flex-col items-center justify-start p-4 md:p-8 w-full max-w-6xl mx-auto overflow-y-auto custom-scroll">
-        
-        <!-- DASHBOARD VIEW -->
-        <section id="scene-home" class="w-full flex flex-col items-center">
-            <div class="text-center my-6 max-w-xl">
-                <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">Neural Operations Protocol</h2>
-                <p class="text-slate-400 text-sm">Select an active logic pathway to initiate cognitive verification sequence.</p>
+    <!-- Main Dynamic Content Region -->
+    <main id="app-viewport" class="flex-1 flex flex-col items-center justify-center p-4 md:p-8 relative">
+
+        <!-- 1. PAGINATED AUTHENTICATION ENGINE (PAGINATION QUESTIONING) -->
+        <section id="view-auth" class="w-full max-w-md bg-brand-cardBg border border-brand-border p-6 md:p-8 rounded-none glow-red">
+            <div class="mb-6 flex justify-between items-center border-b border-brand-border pb-3">
+                <span class="text-xs font-mono text-brand-red uppercase">IDENTITY VERIFICATION</span>
+                <span id="auth-page-indicator" class="text-xs font-mono text-gray-500">PAGE 1 / 3</span>
             </div>
+
+            <!-- Auth Page 1: Codename -->
+            <div id="auth-page-1" class="auth-page">
+                <h2 class="text-xl font-bold uppercase mb-2">Establish Identity</h2>
+                <p class="text-xs text-gray-400 mb-6">Enter your designated operator codename to track scores infinite progression.</p>
+                <input id="auth-username" type="text" placeholder="OPERATOR CODENAME" class="w-full bg-black border border-brand-border p-3 text-sm font-mono text-white focus:outline-none focus:border-brand-red mb-6 uppercase">
+                <button onclick="Auth.nextPage(2)" class="w-full py-3 bg-brand-red text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition">PROCEED TO SECURITY →</button>
+            </div>
+
+            <!-- Auth Page 2: Security Assessment -->
+            <div id="auth-page-2" class="auth-page hidden">
+                <h2 class="text-xl font-bold uppercase mb-2">Cognitive Clearance</h2>
+                <p class="text-xs text-gray-400 mb-6">Answer baseline question: Which sequence breaks logical flow? (A, B, C, D)</p>
+                <div class="space-y-2 mb-6 font-mono text-xs">
+                    <button onclick="Auth.selectAnswer(this, 'A')" class="auth-opt w-full text-left p-3 border border-brand-border hover:border-brand-red bg-black">A) 2 → 4 → 8 → 16</button>
+                    <button onclick="Auth.selectAnswer(this, 'B')" class="auth-opt w-full text-left p-3 border border-brand-border hover:border-brand-red bg-black">B) 3 → 6 → 12 → 24</button>
+                    <button onclick="Auth.selectAnswer(this, 'C')" class="auth-opt w-full text-left p-3 border border-brand-border hover:border-brand-red bg-black">C) 5 → 10 → 15 → 20</button>
+                    <button onclick="Auth.selectAnswer(this, 'D')" class="auth-opt w-full text-left p-3 border border-brand-border hover:border-brand-red bg-black">D) 1 → 2 → 4 → 8</button>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="Auth.nextPage(1)" class="w-1/3 py-3 border border-brand-border text-xs font-mono text-gray-400">BACK</button>
+                    <button onclick="Auth.nextPage(3)" class="w-2/3 py-3 bg-brand-red text-black font-bold text-xs uppercase hover:bg-white transition">VERIFY & PROCEED →</button>
+                </div>
+            </div>
+
+            <!-- Auth Page 3: Protocol Agreement -->
+            <div id="auth-page-3" class="auth-page hidden">
+                <h2 class="text-xl font-bold uppercase mb-2">Infinite Loop Authorization</h2>
+                <p class="text-xs text-gray-400 mb-6">You are entering an infinite non-mathematical spatial and visual logic loop. Every passed level grants exactly +20 PTs.</p>
+                <div class="p-3 border border-brand-border bg-black text-xs font-mono text-gray-400 mb-6">
+                    [CONFIRM] Continuous state generation enabled.<br>
+                    [CONFIRM] Score increments +20 PTs per pass.<br>
+                    [CONFIRM] No math algorithms engaged.
+                </div>
+                <button onclick="Auth.complete()" class="w-full py-3 bg-brand-red text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition">INITIALIZE ENGINE</button>
+            </div>
+        </section>
+
+        <!-- 2. INFINITE IQ ENGINE VIEW -->
+        <section id="view-game" class="w-full max-w-5xl hidden flex flex-col items-center">
             
-            <div id="level-grid" class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <!-- Level Bar -->
+            <div class="w-full flex justify-between items-center mb-6 border-b border-brand-border pb-3">
+                <div>
+                    <span class="text-xs font-mono text-brand-red uppercase">INFINITE STAGE</span>
+                    <h2 id="level-display-title" class="text-2xl font-bold uppercase">STAGE 1</h2>
+                </div>
+                <div class="text-right font-mono">
+                    <span class="text-xs text-gray-500">LEVEL REWARD</span>
+                    <div class="text-brand-red font-bold text-lg">+20 PT</div>
+                </div>
+            </div>
 
-            <div class="flex flex-wrap gap-3 mt-8 justify-center">
-                <button onclick="Game.openBuilder()" 
-                        class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-brand-500/50 rounded-xl text-xs font-mono tracking-wider uppercase text-slate-200 flex items-center gap-2.5 transition-all shadow-lg">
-                    <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                    Architect Protocol
-                </button>
-                <button onclick="Game.startDaily()" 
-                        class="px-5 py-2.5 bg-gradient-to-r from-brand-500/20 to-slate-900 hover:from-brand-500/30 border border-brand-500/30 rounded-xl text-xs font-mono tracking-wider uppercase text-brand-400 flex items-center gap-2.5 transition-all shadow-lg">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    Daily Challenge
-                </button>
+            <!-- DUAL LAYOUT CONTAINER -->
+            <div id="game-layout-container" class="w-full">
+                <!-- Inner structure dynamically rendered by layout engine -->
             </div>
         </section>
 
-        <!-- GAME EXECUTION VIEW -->
-        <section id="scene-game" class="hidden w-full max-w-xl my-auto">
-            <div class="glass-panel border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-                <!-- Progress Header -->
-                <div class="h-1 w-full bg-slate-900">
-                    <div id="progress-bar" class="h-full bg-brand-500 transition-all duration-500" style="width: 0%"></div>
+        <!-- 3. RECORDS KEEPING PAGE -->
+        <section id="view-records" class="w-full max-w-4xl hidden">
+            <div class="flex justify-between items-center mb-6 border-b border-brand-border pb-4">
+                <div>
+                    <h2 class="text-2xl font-bold uppercase">OPERATOR PERFORMANCE RECORDS</h2>
+                    <p class="text-xs text-gray-400 font-mono">Continuous log of passed levels and point accumulation.</p>
                 </div>
+                <button onclick="App.navigate('game')" class="px-4 py-2 bg-brand-red text-black font-bold text-xs uppercase hover:bg-white transition">RETURN TO MATRIX</button>
+            </div>
 
-                <div class="p-5 border-b border-slate-800/80 flex justify-between items-center bg-slate-900/40">
-                    <div>
-                        <span id="game-difficulty-badge" class="inline-block text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 mb-1"></span>
-                        <h3 id="game-title" class="text-lg font-bold text-slate-100"></h3>
-                    </div>
-                    <button onclick="Game.returnToHome()" 
-                            class="text-xs font-mono px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-lg transition">ABORT</button>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="bg-brand-cardBg border border-brand-border p-4">
+                    <div class="text-xs font-mono text-gray-500">TOTAL EARNED SCORE</div>
+                    <div id="record-score" class="text-3xl font-mono font-bold text-brand-red mt-1">0 PT</div>
                 </div>
-
-                <div class="p-6 md:p-8 flex-1 flex flex-col items-center">
-                    <!-- Instruction -->
-                    <div class="w-full text-center mb-6">
-                        <p class="text-xs font-mono text-brand-400 uppercase tracking-wider mb-1">Execution Rule</p>
-                        <p id="game-instruction" class="text-base text-slate-200 font-medium"></p>
-                    </div>
-                    
-                    <!-- Steps Container -->
-                    <div id="steps-list" class="w-full space-y-2 mb-6 max-h-60 overflow-y-auto custom-scroll pr-1"></div>
-
-                    <!-- Input Terminal -->
-                    <div id="input-area" class="w-full max-w-xs bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col items-center focus-within:border-brand-500/60 transition">
-                        <label for="user-input" class="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-2">OUTPUT RESULT VALUE</label>
-                        <input id="user-input" type="number" 
-                               class="w-full bg-transparent text-center text-4xl font-mono font-bold outline-none text-brand-400 placeholder-slate-700"
-                               placeholder="00" autocomplete="off">
-                    </div>
+                <div class="bg-brand-cardBg border border-brand-border p-4">
+                    <div class="text-xs font-mono text-gray-500">HIGHEST STAGE REACHED</div>
+                    <div id="record-stage" class="text-3xl font-mono font-bold text-white mt-1">STAGE 1</div>
                 </div>
-
-                <div class="p-4 border-t border-slate-800/80 bg-slate-900/40">
-                    <button id="action-btn" onclick="Game.submitAnswer()"
-                            class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-slate-950 font-semibold text-sm rounded-xl transition shadow-lg shadow-brand-500/10 active:scale-[0.99]">
-                        EXECUTE VERIFICATION
-                    </button>
+                <div class="bg-brand-cardBg border border-brand-border p-4">
+                    <div class="text-xs font-mono text-gray-500">COMPLETED PUZZLES</div>
+                    <div id="record-count" class="text-3xl font-mono font-bold text-white mt-1">0</div>
                 </div>
             </div>
-        </section>
 
-        <!-- RESULT ANALYSIS VIEW -->
-        <section id="scene-result" class="hidden w-full max-w-md my-auto text-center">
-            <div class="glass-panel border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
-                <div class="scanner-beam"></div>
-
-                <div class="mb-6 inline-flex relative">
-                    <div class="w-32 h-32 rounded-2xl bg-slate-950 border border-brand-500/40 flex items-center justify-center shadow-inner relative z-10">
-                        <span id="final-reveal" class="font-mono text-6xl font-extrabold text-brand-400">--</span>
-                    </div>
-                    <div class="absolute inset-0 bg-brand-500/20 blur-xl rounded-full"></div>
-                </div>
-                
-                <h2 class="text-xl font-bold text-white mb-1">State Recovered</h2>
-                <p id="result-subtitle" class="text-xs text-slate-400 mb-6">Original variable successfully isolated via inverse execution.</p>
-
-                <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-left mb-6 font-mono text-xs text-slate-300 leading-relaxed">
-                    <div class="text-[10px] text-brand-400 uppercase tracking-wider mb-2 font-bold">Inverse Log</div>
-                    <div id="logic-explanation" class="whitespace-pre-line text-slate-400"></div>
-                </div>
-
-                <div class="flex gap-3">
-                    <button onclick="Game.restartCurrent()" 
-                            class="flex-1 py-3 border border-slate-700 hover:bg-slate-800 rounded-xl text-xs font-mono font-semibold text-slate-300 transition">RETRY</button>
-                    <button onclick="Game.returnToHome()" 
-                            class="flex-1 py-3 bg-brand-500 hover:bg-brand-400 text-slate-950 rounded-xl text-xs font-mono font-bold transition">CONTINUE</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- ARCHITECT/BUILDER VIEW -->
-        <section id="scene-builder" class="hidden w-full max-w-2xl my-auto">
-            <div class="glass-panel border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl">
-                <div class="mb-6 flex justify-between items-end border-b border-slate-800 pb-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-white">Protocol Architect</h2>
-                        <p class="text-xs text-slate-400">Design linear transformations to form deterministic logic pathways.</p>
-                    </div>
-                    <span id="builder-status" class="text-[10px] font-mono px-2 py-1 bg-slate-900 border border-slate-800 rounded text-slate-400">0 OP</span>
-                </div>
-
-                <!-- Sequence Track -->
-                <div id="builder-steps" class="min-h-[160px] max-h-[260px] overflow-y-auto custom-scroll space-y-2 mb-6 p-2 bg-slate-950/50 rounded-xl border border-slate-800/80"></div>
-
-                <!-- Operation Controls -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
-                    <button onclick="Builder.addOp('add')" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-mono text-slate-300 flex items-center justify-center gap-1.5 transition">
-                        <span class="text-brand-400 font-bold">+</span> ADD
-                    </button>
-                    <button onclick="Builder.addOp('sub')" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-mono text-slate-300 flex items-center justify-center gap-1.5 transition">
-                        <span class="text-brand-400 font-bold">-</span> SUBTRACT
-                    </button>
-                    <button onclick="Builder.addOp('mul')" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-mono text-slate-300 flex items-center justify-center gap-1.5 transition">
-                        <span class="text-brand-400 font-bold">×</span> MULTIPLY
-                    </button>
-                    <button onclick="Builder.addOp('div')" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-mono text-slate-300 flex items-center justify-center gap-1.5 transition">
-                        <span class="text-brand-400 font-bold">÷</span> DIVIDE
-                    </button>
-                </div>
-
-                <div class="flex justify-between items-center pt-4 border-t border-slate-800">
-                    <button onclick="Game.returnToHome()" class="px-4 py-2.5 text-xs font-mono text-slate-400 hover:text-slate-200 transition">DISCARD</button>
-                    <button onclick="Builder.testAndSave()" 
-                            class="px-6 py-2.5 bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold text-xs font-mono rounded-xl transition shadow-lg shadow-brand-500/10">COMPILE &amp; SAVE</button>
+            <div class="bg-brand-cardBg border border-brand-border p-4">
+                <h3 class="text-xs font-mono uppercase text-brand-red mb-4">LOG HISTORY</h3>
+                <div id="records-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar font-mono text-xs">
+                    <!-- Dynamic logs inserted here -->
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- NEURAL PROFILE MODAL -->
-    <div id="stats-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
-        <div class="glass-panel border border-slate-800 rounded-2xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col shadow-2xl">
-            <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                    Neural Telemetry
-                </h3>
-                <button onclick="ProfileModal.toggle()" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
-            </div>
-            
-            <div class="p-6 overflow-y-auto custom-scroll space-y-6">
-                <!-- Metrics Grid -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-slate-950/60 border border-slate-800/80 p-4 rounded-xl">
-                        <div class="text-[10px] font-mono text-slate-400 uppercase">Total XP</div>
-                        <div id="modal-xp" class="font-mono text-3xl font-bold text-brand-400 mt-1">0</div>
-                    </div>
-                    <div class="bg-slate-950/60 border border-slate-800/80 p-4 rounded-xl">
-                        <div class="text-[10px] font-mono text-slate-400 uppercase">Active Streak</div>
-                        <div id="modal-streak" class="font-mono text-3xl font-bold text-slate-100 mt-1">0</div>
-                    </div>
-                </div>
+    <!-- Global Footer -->
+    <footer class="border-t border-brand-border bg-black px-6 py-4 text-center text-xs font-mono text-gray-600">
+        NEXUS UNPROGRAMMABLE IQ MATRIX // NO MATH ENGINE // WHITE-BLACK-RED SPECTRA
+    </footer>
 
-                <!-- Achievements -->
-                <div>
-                    <h4 class="text-xs font-mono uppercase text-slate-400 mb-3">Milestone Badges</h4>
-                    <div id="achievements-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
-                </div>
-
-                <!-- Session Log -->
-                <div>
-                    <h4 class="text-xs font-mono uppercase text-slate-400 mb-3">Execution History</h4>
-                    <div id="history-list" class="space-y-2"></div>
-                </div>
-            </div>
+    <!-- Custom Alert Overlay -->
+    <div id="custom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-brand-cardBg border border-brand-red p-6 max-w-sm w-full text-center glow-red">
+            <div id="modal-icon" class="text-3xl text-brand-red mb-3"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <p id="modal-msg" class="text-sm font-mono text-white mb-6"></p>
+            <button onclick="App.closeModal()" class="w-full py-2 bg-brand-red text-black font-bold text-xs uppercase hover:bg-white transition">ACKNOWLEDGE</button>
         </div>
     </div>
 
-    <!-- GLOBAL CUSTOM ALERT DIALOG -->
-    <div id="custom-alert" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
-        <div class="glass-panel border border-slate-800 rounded-xl p-6 w-full max-w-sm text-center shadow-2xl">
-            <div id="custom-alert-icon" class="text-3xl mb-2">⚠️</div>
-            <p id="custom-alert-msg" class="text-sm text-slate-200 mb-5 font-medium"></p>
-            <button onclick="CustomAlert.close()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-mono font-bold rounded-lg border border-slate-700 transition">ACKNOWLEDGE</button>
-        </div>
-    </div>
-
-    <!-- APPLICATION LOGIC ENGINE -->
-    <script>
-        // System Alert Modal Implementation
-        const CustomAlert = {
-            show(msg, icon = "⚠️") {
-                document.getElementById("custom-alert-msg").innerText = msg
-                document.getElementById("custom-alert-icon").innerText = icon
-                document.getElementById("custom-alert").classList.remove("hidden")
-            },
-            close() {
-                document.getElementById("custom-alert").classList.add("hidden")
-            }
-        }
-
+    <!-- Application Engine Logic -->
+    <script id="game-engine">
         // Global Application State
-        let state = {
-            xp: 1240,
-            streak: 7,
-            lastPlayDate: "",
-            customModules: [],
-            history: [],
-            achievements: [
-                { id: "first", name: "First Read", desc: "Complete initial protocol", unlocked: false, icon: "⚡" },
-                { id: "builder", name: "Architect", desc: "Construct custom sequence", unlocked: false, icon: "⚙️" },
-                { id: "streak5", name: "Neural Flow", desc: "Maintain 5-day active streak", unlocked: false, icon: "🔥" },
-                { id: "expert", name: "Master Mind", desc: "Solve Expert protocol", unlocked: false, icon: "🧠" }
-            ],
-            modules: [
-                {
-                    id: "arith1",
-                    name: "Arithmetic Oracle",
-                    desc: "Fundamental operational sequence for baseline evaluation.",
-                    icon: "🔢",
-                    difficulty: "Easy",
-                    ops: [
-                        { op: "mul", val: 2 },
-                        { op: "add", val: 8 },
-                        { op: "mul", val: 5 }
-                    ]
-                },
-                {
-                    id: "vortex",
-                    name: "Golden Vortex",
-                    desc: "Symmetric cancellation protocol isolating linear terms.",
-                    icon: "🌀",
-                    difficulty: "Medium",
-                    ops: [
-                        { op: "mul", val: 3 },
-                        { op: "add", val: 6 },
-                        { op: "div", val: 3 }
-                    ]
-                },
-                {
-                    id: "neural",
-                    name: "Neural Eliminator",
-                    desc: "Multi-stage inversion challenge with expanded operator bounds.",
-                    icon: "🧬",
-                    difficulty: "Hard",
-                    ops: [
-                        { op: "mul", val: 4 },
-                        { op: "sub", val: 10 },
-                        { op: "mul", val: 3 },
-                        { op: "add", val: 20 }
-                    ]
-                },
-                {
-                    id: "quantum",
-                    name: "Quantum Echo",
-                    desc: "High-order state recovery requiring precise numerical tracking.",
-                    icon: "🌌",
-                    difficulty: "Expert",
-                    ops: [
-                        { op: "mul", val: 9 },
-                        { op: "add", val: 45 },
-                        { op: "div", val: 9 },
-                        { op: "add", val: 7 }
-                    ]
-                }
-            ]
-        }
+        const state = {
+            user: null,
+            score: 0,
+            stage: 1,
+            completedCount: 0,
+            layout: 'card', // 'card' or 'split'
+            records: [],
+            currentPuzzle: null,
+            selectedAuthAnswer: null
+        };
 
-        let currentModule = null
-        let currentOps = []
-        let currentDifficulty = "Medium"
-
-        // Pure Functional Helpers
-        function applyForward(ops, x) {
-            let val = x
-            for (let op of ops) {
-                if (op.op === "add") val += op.val
-                else if (op.op === "sub") val -= op.val
-                else if (op.op === "mul") val *= op.val
-                else if (op.op === "div") val /= op.val
-            }
-            return Math.round(val * 100) / 100
-        }
-
-        function applyInverse(ops, final) {
-            let val = final
-            for (let i = ops.length - 1; i >= 0; i--) {
-                const op = ops[i]
-                if (op.op === "add") val -= op.val
-                else if (op.op === "sub") val += op.val
-                else if (op.op === "mul") val /= op.val
-                else if (op.op === "div") val *= op.val
-            }
-            return Math.round(val * 100) / 100
-        }
-
-        function getStepText(op) {
-            switch (op.op) {
-                case "add": return `Add ${op.val}`
-                case "sub": return `Subtract ${op.val}`
-                case "mul": return `Multiply by ${op.val}`
-                case "div": return `Divide by ${op.val}`
-            }
-        }
-
-        function saveState() {
-            localStorage.setItem("mindlogic_state", JSON.stringify(state))
-        }
-
-        function loadState() {
-            const saved = localStorage.getItem("mindlogic_state")
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved)
-                    state = { ...state, ...parsed }
-                } catch (e) {
-                    console.error("State recovery error", e)
-                }
-            }
-        }
-
-        // Game Controller Engine
-        const Game = {
-            init() {
-                loadState()
-                this.updateDisplays()
-                this.populateLevels()
-                this.filterModules()
-            },
-
-            updateDisplays() {
-                document.getElementById("xp-display").textContent = state.xp
-                document.getElementById("streak-display").textContent = state.streak
-            },
-
-            populateLevels() {
-                const grid = document.getElementById("level-grid")
-                grid.innerHTML = ""
-                
-                const allMods = [...state.modules, ...state.customModules]
-                
-                allMods.forEach(mod => {
-                    const card = document.createElement("div")
-                    card.className = `glass-card rounded-xl p-5 cursor-pointer flex flex-col justify-between group`
-                    
-                    const badgeColor = mod.difficulty === "Easy" ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" :
-                                       mod.difficulty === "Medium" ? "text-brand-400 bg-brand-500/10 border-brand-500/20" :
-                                       mod.difficulty === "Hard" ? "text-rose-400 bg-rose-500/10 border-rose-500/20" :
-                                       "text-purple-400 bg-purple-500/10 border-purple-500/20"
-
-                    card.innerHTML = `
-                        <div>
-                            <div class="flex justify-between items-start mb-3">
-                                <span class="text-3xl p-2 bg-slate-950/50 rounded-lg border border-slate-800">${mod.icon}</span>
-                                <span class="text-[10px] font-mono px-2 py-0.5 rounded border ${badgeColor}">${mod.difficulty}</span>
-                            </div>
-                            <h4 class="font-bold text-slate-100 text-base mb-1 group-hover:text-brand-400 transition-colors">${mod.name}</h4>
-                            <p class="text-slate-400 text-xs leading-relaxed line-clamp-2">${mod.desc}</p>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs font-mono text-slate-400 group-hover:text-slate-200">
-                            <span>RUN SEQUENCE</span>
-                            <span class="group-hover:translate-x-1 transition-transform">→</span>
-                        </div>
-                    `
-                    card.onclick = () => this.startGame(mod)
-                    grid.appendChild(card)
-                })
-            },
-
-            filterModules() {
-                const filter = document.getElementById("difficulty-select").value
-                const cards = document.querySelectorAll("#level-grid > div")
-                
-                cards.forEach((card, index) => {
-                    const allMods = [...state.modules, ...state.customModules]
-                    const mod = allMods[index]
-                    if (!mod) return
-                    
-                    if (filter === "all" || mod.difficulty === filter) {
-                        card.style.display = "flex"
-                    } else {
-                        card.style.display = "none"
-                    }
-                })
-            },
-
-            startGame(mod) {
-                currentModule = mod
-                currentOps = [...mod.ops]
-                currentDifficulty = mod.difficulty || "Medium"
-                
-                document.querySelectorAll("section[id^='scene-']").forEach(s => s.classList.add("hidden"))
-                document.getElementById("scene-game").classList.remove("hidden")
-                
-                document.getElementById("game-title").textContent = mod.name
-                document.getElementById("game-difficulty-badge").textContent = mod.difficulty
-                document.getElementById("game-instruction").innerHTML = `Select an integer initial value <span class="font-mono text-brand-400">x</span> (1–30), then perform sequence below:`
-                
-                const stepsContainer = document.getElementById("steps-list")
-                stepsContainer.innerHTML = currentOps.map((op, i) => `
-                    <div class="flex items-center gap-3 bg-slate-950/60 border border-slate-800/80 px-3.5 py-2.5 rounded-lg text-xs font-mono">
-                        <span class="w-5 h-5 flex items-center justify-center bg-slate-800 text-brand-400 font-bold rounded">${i+1}</span>
-                        <span class="text-slate-200">${getStepText(op)}</span>
-                    </div>
-                `).join("")
-                
-                document.getElementById("user-input").value = ""
-                document.getElementById("progress-bar").style.width = "40%"
-            },
-
-            submitAnswer() {
-                const inputEl = document.getElementById("user-input")
-                let userFinal = parseFloat(inputEl.value)
-                
-                if (isNaN(userFinal)) {
-                    CustomAlert.show("Please enter a valid numeric computed result.")
-                    return
-                }
-                
-                const recovered = applyInverse(currentOps, userFinal)
-                const rounded = Math.round(recovered)
-                
-                if (rounded < 1 || rounded > 30) {
-                    CustomAlert.show("Computed state yields initial x outside bounds (1–30). Check arithmetic.")
-                    return
-                }
-                
-                this.showResult(rounded, userFinal)
-            },
-
-            showResult(recoveredX, finalInput) {
-                document.querySelectorAll("section[id^='scene-']").forEach(s => s.classList.add("hidden"))
-                document.getElementById("scene-result").classList.remove("hidden")
-                
-                document.getElementById("final-reveal").textContent = recoveredX
-                
-                let expl = `Input Value Output: ${finalInput}\n`
-                expl += `Inverse Sequence Applied:\n`
-                currentOps.slice().reverse().forEach((op) => {
-                    const invOp = op.op === 'add' ? 'sub' : op.op === 'sub' ? 'add' : op.op === 'mul' ? 'div' : 'mul'
-                    expl += ` └ Invert ${op.op} (${op.val}) → ${invOp}\n`
-                })
-                expl += `Recovered Initial State: x = ${recoveredX}`
-                
-                document.getElementById("logic-explanation").textContent = expl
-                
-                const xpGain = currentDifficulty === "Easy" ? 25 : 
-                               currentDifficulty === "Medium" ? 45 : 
-                               currentDifficulty === "Hard" ? 70 : 120
-                
-                state.xp += xpGain
-                
-                const today = new Date().toDateString()
-                if (state.lastPlayDate !== today) {
-                    state.streak++
-                    state.lastPlayDate = today
-                }
-                
-                state.history.unshift({
-                    name: currentModule.name,
-                    xp: xpGain,
-                    date: new Date().toLocaleDateString()
-                })
-                if (state.history.length > 10) state.history.pop()
-                
-                this.updateDisplays()
-                this.checkAchievements()
-                saveState()
-            },
-
-            restartCurrent() {
-                if (currentModule) this.startGame(currentModule)
-            },
-
-            returnToHome() {
-                document.querySelectorAll("section[id^='scene-']").forEach(s => s.classList.add("hidden"))
-                document.getElementById("scene-home").classList.remove("hidden")
-                this.populateLevels()
-            },
-
-            openBuilder() {
-                document.querySelectorAll("section[id^='scene-']").forEach(s => s.classList.add("hidden"))
-                document.getElementById("scene-builder").classList.remove("hidden")
-                Builder.reset()
-            },
-
-            startDaily() {
-                const pool = state.modules.filter(m => m.difficulty === "Hard" || m.difficulty === "Expert")
-                const randomMod = pool[Math.floor(Math.random() * pool.length)] || state.modules[0]
-                this.startGame(randomMod)
-            },
-
-            checkAchievements() {
-                if (state.xp > 100) state.achievements[0].unlocked = true
-                if (state.customModules.length >= 1) state.achievements[1].unlocked = true
-                if (state.streak >= 5) state.achievements[2].unlocked = true
-                if (currentDifficulty === "Expert") state.achievements[3].unlocked = true
-                saveState()
-            },
-
-            addCustomModule(newMod) {
-                state.customModules.push(newMod)
-                saveState()
-                this.populateLevels()
-            }
-        }
-
-        // Protocol Architect Engine
-        const Builder = {
-            currentOps: [],
+        // Non-Math Visual & Spatial Logic IQ Challenge Generator
+        const IQEngine = {
+            shapes: ['fa-square', 'fa-circle', 'fa-triangle-exclamation', 'fa-diamond', 'fa-star', 'fa-hexagon'],
+            rotations: ['rotate-0', 'rotate-90', 'rotate-180', 'rotate-270'],
             
-            reset() {
-                this.currentOps = []
-                this.renderSteps()
-            },
-            
-            addOp(type) {
-                const valStr = prompt(`Enter numerical operand for ${type.toUpperCase()}:`, type === "mul" || type === "div" ? "2" : "5")
-                if (valStr === null) return
-                
-                const val = parseFloat(valStr)
-                if (isNaN(val) || val === 0) {
-                    CustomAlert.show("Operand must be a non-zero number.")
-                    return
-                }
-                
-                this.currentOps.push({ op: type, val: val })
-                this.renderSteps()
-            },
-            
-            renderSteps() {
-                const container = document.getElementById("builder-steps")
-                container.innerHTML = ""
-                
-                if (this.currentOps.length === 0) {
-                    container.innerHTML = `<div class="text-slate-500 italic text-center py-10 text-xs font-mono">No steps appended. Select operations below to build sequence.</div>`
-                    document.getElementById("builder-status").textContent = "0 OP"
-                    return
-                }
-                
-                this.currentOps.forEach((op, i) => {
-                    const div = document.createElement("div")
-                    div.className = "flex items-center justify-between bg-slate-900 border border-slate-800 px-3.5 py-2.5 rounded-lg text-xs font-mono"
-                    div.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <span class="text-brand-400 font-bold">${i+1}.</span>
-                            <span class="text-slate-200">${getStepText(op)}</span>
-                        </div>
-                        <button onclick="Builder.removeStep(${i})" class="text-slate-500 hover:text-rose-400 transition">&times;</button>
-                    `
-                    container.appendChild(div)
-                })
-                
-                document.getElementById("builder-status").textContent = `${this.currentOps.length} OP ACTIVE`
-            },
-            
-            removeStep(index) {
-                this.currentOps.splice(index, 1)
-                this.renderSteps()
-            },
-            
-            testAndSave() {
-                if (this.currentOps.length === 0) {
-                    CustomAlert.show("Sequence must contain at least one operation.")
-                    return
-                }
-                
-                const testX = Math.floor(Math.random() * 20) + 1
-                const computedFinal = applyForward(this.currentOps, testX)
-                const recovered = applyInverse(this.currentOps, computedFinal)
-                
-                if (Math.abs(recovered - testX) < 0.01) {
-                    const newMod = {
-                        id: "custom-" + Date.now(),
-                        name: "Protocol #" + (state.customModules.length + 1),
-                        desc: "Custom compiled pathway sequence.",
-                        icon: "🛠️",
-                        difficulty: "Medium",
-                        ops: [...this.currentOps]
-                    }
-                    
-                    Game.addCustomModule(newMod)
-                    CustomAlert.show(`Protocol verified and saved successfully.`, "✅")
-                    Game.returnToHome()
+            generatePuzzle(stage) {
+                const puzzleTypes = ['SPATIAL_MATRIX', 'PATTERN_ANOMALY', 'INTERSECTION_LOGIC'];
+                const selectedType = puzzleTypes[Math.floor(Math.random() * puzzleTypes.length)];
+
+                if (selectedType === 'SPATIAL_MATRIX') {
+                    return this.generateMatrixPuzzle(stage);
+                } else if (selectedType === 'PATTERN_ANOMALY') {
+                    return this.generateAnomalyPuzzle(stage);
                 } else {
-                    CustomAlert.show("Sequence state inversion failure. Ensure arithmetic integrity.")
+                    return this.generateIntersectionPuzzle(stage);
                 }
-            }
-        }
+            },
 
-        // Telemetry Profile Controller
-        const ProfileModal = {
-            toggle() {
-                const modal = document.getElementById("stats-modal")
-                if (!modal.classList.contains("hidden")) {
-                    modal.classList.add("hidden")
-                    return
+            generateMatrixPuzzle(stage) {
+                const baseShape = this.shapes[Math.floor(Math.random() * this.shapes.length)];
+                const correctRotationIndex = Math.floor(Math.random() * 4);
+                
+                const matrix = [
+                    { shape: baseShape, rotation: 'rotate-0' },
+                    { shape: baseShape, rotation: 'rotate-90' },
+                    { shape: baseShape, rotation: 'rotate-180' },
+                    { shape: baseShape, rotation: this.rotations[correctRotationIndex] } // The missing piece target
+                ];
+
+                const options = [
+                    { id: 'A', rotation: 'rotate-270', isCorrect: correctRotationIndex === 3 },
+                    { id: 'B', rotation: 'rotate-90', isCorrect: false },
+                    { id: 'C', rotation: 'rotate-180', isCorrect: false },
+                    { id: 'D', rotation: 'rotate-0', isCorrect: false }
+                ];
+
+                // Shuffle options
+                options.sort(() => Math.random() - 0.5);
+
+                return {
+                    type: 'SPATIAL ROTATION MATRIX',
+                    instruction: 'Identify the missing sequential pattern orientation to complete the spatial grid.',
+                    matrix: matrix,
+                    options: options,
+                    shape: baseShape
+                };
+            },
+
+            generateAnomalyPuzzle(stage) {
+                const targetShape = this.shapes[Math.floor(Math.random() * this.shapes.length)];
+                const anomalyShape = this.shapes.find(s => s !== targetShape);
+
+                const options = [
+                    { id: 'A', shape: targetShape, isCorrect: false },
+                    { id: 'B', shape: targetShape, isCorrect: false },
+                    { id: 'C', shape: anomalyShape, isCorrect: true }, // Anomaly
+                    { id: 'D', shape: targetShape, isCorrect: false }
+                ].sort(() => Math.random() - 0.5);
+
+                return {
+                    type: 'PATTERN ANOMALY DETECTION',
+                    instruction: 'Scan the geometric array. Select the structural component that breaks symbolic symmetry.',
+                    options: options,
+                    matrix: null
+                };
+            },
+
+            generateIntersectionPuzzle(stage) {
+                const shapes = [...this.shapes].sort(() => Math.random() - 0.5);
+                const target = shapes[0];
+
+                const options = [
+                    { id: 'A', shape: shapes[0], isCorrect: true },
+                    { id: 'B', shape: shapes[1], isCorrect: false },
+                    { id: 'C', shape: shapes[2], isCorrect: false },
+                    { id: 'D', shape: shapes[3], isCorrect: false }
+                ].sort(() => Math.random() - 0.5);
+
+                return {
+                    type: 'ABSTRUCT SET INTERSECTION',
+                    instruction: 'Determine which primary geometric key resolves the structural overlap sequence.',
+                    options: options,
+                    matrix: null
+                };
+            }
+        };
+
+        // Application Controller
+        const App = {
+            init() {
+                this.loadStorage();
+                this.updateUI();
+            },
+
+            loadStorage() {
+                const saved = localStorage.getItem('nexus_iq_state');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state.user = parsed.user;
+                    state.score = parsed.score || 0;
+                    state.stage = parsed.stage || 1;
+                    state.completedCount = parsed.completedCount || 0;
+                    state.records = parsed.records || [];
                 }
+            },
+
+            saveStorage() {
+                localStorage.setItem('nexus_iq_state', JSON.stringify({
+                    user: state.user,
+                    score: state.score,
+                    stage: state.stage,
+                    completedCount: state.completedCount,
+                    records: state.records
+                }));
+            },
+
+            updateUI() {
+                document.getElementById('global-score').textContent = `${state.score} PT`;
+                if (state.user) {
+                    document.getElementById('nav-controls').classList.remove('hidden');
+                    document.getElementById('user-display').textContent = state.user;
+                }
+            },
+
+            navigate(view) {
+                document.querySelectorAll("section[id^='view-']").forEach(el => el.classList.add('hidden'));
+                document.getElementById(`view-${view}`).classList.remove('hidden');
+
+                if (view === 'game') {
+                    this.renderPuzzle();
+                } else if (view === 'records') {
+                    this.renderRecords();
+                }
+            },
+
+            setLayout(type) {
+                state.layout = type;
+                document.getElementById('btn-layout-card').className = type === 'card' 
+                    ? 'px-3 py-1 text-xs font-mono rounded bg-brand-red text-black font-bold' 
+                    : 'px-3 py-1 text-xs font-mono rounded text-white hover:text-brand-red';
+                document.getElementById('btn-layout-split').className = type === 'split' 
+                    ? 'px-3 py-1 text-xs font-mono rounded bg-brand-red text-black font-bold' 
+                    : 'px-3 py-1 text-xs font-mono rounded text-white hover:text-brand-red';
                 
-                modal.classList.remove("hidden")
+                if (!document.getElementById('view-game').classList.contains('hidden')) {
+                    this.renderPuzzle();
+                }
+            },
+
+            renderPuzzle() {
+                state.currentPuzzle = IQEngine.generatePuzzle(state.stage);
+                const container = document.getElementById('game-layout-container');
+                document.getElementById('level-display-title').textContent = `STAGE ${state.stage}`;
                 
-                document.getElementById("modal-xp").textContent = state.xp
-                document.getElementById("modal-streak").textContent = state.streak
-                
-                const achContainer = document.getElementById("achievements-list")
-                achContainer.innerHTML = ""
-                state.achievements.forEach(ach => {
-                    const div = document.createElement("div")
-                    div.className = `flex gap-3 bg-slate-950/60 border border-slate-800/80 p-3 rounded-xl items-center ${ach.unlocked ? "border-brand-500/30" : "opacity-40"}`
-                    div.innerHTML = `
-                        <div class="text-2xl">${ach.icon}</div>
-                        <div>
-                            <div class="text-xs font-bold text-slate-200">${ach.name}</div>
-                            <div class="text-[10px] text-slate-400 leading-tight">${ach.desc}</div>
+                const p = state.currentPuzzle;
+
+                if (state.layout === 'card') {
+                    // Single Centered Card Layout
+                    container.innerHTML = `
+                        <div class="bg-brand-cardBg border border-brand-border p-6 md:p-8 rounded-none glow-red max-w-2xl mx-auto">
+                            <div class="text-xs font-mono text-brand-red uppercase mb-2">${p.type}</div>
+                            <p class="text-sm text-gray-300 font-medium mb-6">${p.instruction}</p>
+
+                            ${p.matrix ? `
+                                <div class="grid grid-cols-2 gap-4 bg-black p-6 border border-brand-border mb-6 w-48 h-48 mx-auto">
+                                    <div class="flex items-center justify-center border border-brand-border text-brand-red text-2xl"><i class="fa-solid ${p.matrix[0].shape} ${p.matrix[0].rotation}"></i></div>
+                                    <div class="flex items-center justify-center border border-brand-border text-brand-red text-2xl"><i class="fa-solid ${p.matrix[1].shape} ${p.matrix[1].rotation}"></i></div>
+                                    <div class="flex items-center justify-center border border-brand-border text-brand-red text-2xl"><i class="fa-solid ${p.matrix[2].shape} ${p.matrix[2].rotation}"></i></div>
+                                    <div class="flex items-center justify-center border border-brand-red/80 bg-brand-red/10 text-white text-xl font-mono font-bold animate-pulse">?</div>
+                                </div>
+                            ` : ''}
+
+                            <div class="grid grid-cols-2 gap-3 font-mono">
+                                ${p.options.map((opt, idx) => `
+                                    <button onclick="App.evaluateAnswer(${opt.isCorrect})" class="p-4 bg-black border border-brand-border hover:border-brand-red flex items-center justify-center gap-3 group transition">
+                                        <span class="text-xs font-bold text-brand-red group-hover:text-white">${String.fromCharCode(65 + idx)})</span>
+                                        ${opt.rotation ? `<i class="fa-solid ${p.shape} ${opt.rotation} text-xl text-white"></i>` : ''}
+                                        ${opt.shape ? `<i class="fa-solid ${opt.shape} text-xl text-white"></i>` : ''}
+                                    </button>
+                                `).join('')}
+                            </div>
                         </div>
-                    `
-                    achContainer.appendChild(div)
-                })
-                
-                const histContainer = document.getElementById("history-list")
-                histContainer.innerHTML = ""
-                state.history.forEach(entry => {
-                    const row = document.createElement("div")
-                    row.className = "flex justify-between bg-slate-950/40 border border-slate-800/60 px-3.5 py-2 rounded-lg text-xs font-mono"
-                    row.innerHTML = `
-                        <span class="text-slate-300">${entry.name}</span>
-                        <div class="text-right">
-                            <span class="text-brand-400 font-bold">+${entry.xp} XP</span>
-                            <span class="text-[10px] text-slate-500 ml-2">${entry.date}</span>
+                    `;
+                } else {
+                    // Split Dual-Panel Layout
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                            <!-- Panel Left: Prompt & Matrix -->
+                            <div class="bg-brand-cardBg border border-brand-border p-6 flex flex-col justify-between">
+                                <div>
+                                    <div class="text-xs font-mono text-brand-red uppercase mb-2">${p.type}</div>
+                                    <p class="text-sm text-gray-300 font-medium mb-6">${p.instruction}</p>
+                                </div>
+                                ${p.matrix ? `
+                                    <div class="grid grid-cols-2 gap-4 bg-black p-6 border border-brand-border w-48 h-48 mx-auto my-auto">
+                                        <div class="flex items-center justify-center border border-brand-border text-brand-red text-2xl"><i class="fa-solid ${p.matrix[0].shape} ${p.matrix[0].rotation}"></i></div>
+                                        <div class="flex items-center justify-center border border-brand-border text-brand-red text-2xl"><i class="fa-solid ${p.matrix[1].shape} ${p.matrix[1].rotation}"></i></div>
+                                        <div class="flex items-center justify-center border border-brand-border text-brand-red text-2xl"><i class="fa-solid ${p.matrix[2].shape} ${p.matrix[2].rotation}"></i></div>
+                                        <div class="flex items-center justify-center border border-brand-red/80 bg-brand-red/10 text-white text-xl font-mono font-bold animate-pulse">?</div>
+                                    </div>
+                                ` : '<div class="p-8 text-center text-xs font-mono text-gray-600 border border-brand-border bg-black my-auto">VISUAL ANOMALY MATRIX READY</div>'}
+                            </div>
+
+                            <!-- Panel Right: Options Selection -->
+                            <div class="bg-brand-cardBg border border-brand-border p-6 flex flex-col justify-center">
+                                <span class="text-xs font-mono text-gray-400 mb-4 block">SELECT LOGICAL RESOLUTION:</span>
+                                <div class="space-y-3 font-mono">
+                                    ${p.options.map((opt, idx) => `
+                                        <button onclick="App.evaluateAnswer(${opt.isCorrect})" class="w-full p-4 bg-black border border-brand-border hover:border-brand-red flex items-center justify-between group transition">
+                                            <span class="text-xs font-bold text-brand-red group-hover:text-white">OPTION ${String.fromCharCode(65 + idx)}</span>
+                                            ${opt.rotation ? `<i class="fa-solid ${p.shape} ${opt.rotation} text-2xl text-white"></i>` : ''}
+                                            ${opt.shape ? `<i class="fa-solid ${opt.shape} text-2xl text-white"></i>` : ''}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
                         </div>
-                    `
-                    histContainer.appendChild(row)
-                })
-                
-                if (state.history.length === 0) {
-                    histContainer.innerHTML = `<div class="text-slate-500 text-center py-4 text-xs font-mono">No telemetry logged.</div>`
+                    `;
                 }
-            }
-        }
+            },
 
-        // Global Bindings & Keyboard Listeners
-        window.Game = Game
-        window.ProfileModal = ProfileModal
-        window.Builder = Builder
+            evaluateAnswer(isCorrect) {
+                if (isCorrect) {
+                    state.score += 20; // +20 PT earned per level
+                    state.stage += 1; // Infinite unprogrammable loop level increase
+                    state.completedCount += 1;
 
-        document.addEventListener("keydown", e => {
-            if (e.key === "Enter" && !document.getElementById("scene-game").classList.contains("hidden")) {
-                const input = document.getElementById("user-input")
-                if (document.activeElement === input) {
-                    Game.submitAnswer()
+                    state.records.unshift({
+                        stage: state.stage - 1,
+                        pointsEarned: 20,
+                        totalScore: state.score,
+                        timestamp: new Date().toLocaleTimeString()
+                    });
+
+                    this.saveStorage();
+                    this.updateUI();
+                    this.showModal('STAGE CLEARED! +20 PT EARNED.', 'fa-circle-check');
+                    this.renderPuzzle();
+                } else {
+                    this.showModal('INCORRECT REASONING. TRY AGAIN.', 'fa-triangle-exclamation');
                 }
-            }
-        })
+            },
 
-        // Entry Initialization
+            renderRecords() {
+                document.getElementById('record-score').textContent = `${state.score} PT`;
+                document.getElementById('record-stage').textContent = `STAGE ${state.stage}`;
+                document.getElementById('record-count').textContent = state.completedCount;
+
+                const list = document.getElementById('records-list');
+                if (state.records.length === 0) {
+                    list.innerHTML = `<div class="p-4 text-center text-gray-600">NO EVALUATION RECORDS LOGGED YET.</div>`;
+                    return;
+                }
+
+                list.innerHTML = state.records.map(r => `
+                    <div class="flex justify-between p-3 bg-black border border-brand-border">
+                        <span class="text-brand-red font-bold">COMPLETED STAGE ${r.stage}</span>
+                        <span class="text-white">+${r.pointsEarned} PT</span>
+                        <span class="text-gray-500">${r.timestamp}</span>
+                    </div>
+                `).join('');
+            },
+
+            showModal(msg, icon = 'fa-triangle-exclamation') {
+                document.getElementById('modal-msg').textContent = msg;
+                document.getElementById('modal-icon').innerHTML = `<i class="fa-solid ${icon}"></i>`;
+                document.getElementById('custom-modal').classList.remove('hidden');
+            },
+
+            closeModal() {
+                document.getElementById('custom-modal').classList.add('hidden');
+            }
+        };
+
+        // Paginated Authentication System
+        const Auth = {
+            currentPage: 1,
+
+            nextPage(pageNumber) {
+                if (pageNumber === 2) {
+                    const name = document.getElementById('auth-username').value.trim();
+                    if (!name) {
+                        App.showModal('PLEASE ENTER A VALID OPERATOR CODENAME.');
+                        return;
+                    }
+                    state.user = name;
+                }
+
+                document.querySelectorAll('.auth-page').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`auth-page-${pageNumber}`).classList.remove('hidden');
+                document.getElementById('auth-page-indicator').textContent = `PAGE ${pageNumber} / 3`;
+                this.currentPage = pageNumber;
+            },
+
+            selectAnswer(btn, option) {
+                document.querySelectorAll('.auth-opt').forEach(el => el.classList.remove('border-brand-red', 'bg-brand-red/10'));
+                btn.classList.add('border-brand-red', 'bg-brand-red/10');
+                state.selectedAuthAnswer = option;
+            },
+
+            complete() {
+                App.saveStorage();
+                App.updateUI();
+                App.navigate('game');
+            }
+        };
+
+        // On Page Initialization
         window.onload = () => {
-            Game.init()
-        }
+            App.init();
+            if (state.user) {
+                App.navigate('game');
+            } else {
+                App.navigate('auth');
+            }
+        };
     </script>
 </body>
 </html>
