@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-black text-white antialiased">
+<html lang="en" class="h-full bg-white text-black antialiased">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS // Infinite IQ Matrix</title>
+    <title>NEXUS // Cognitive IQ Engine</title>
     
     <!-- Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
@@ -18,11 +18,12 @@
                 extend: {
                     colors: {
                         brand: {
-                            red: '#FF003C',
-                            darkRed: '#990024',
-                            black: '#0A0A0A',
-                            cardBg: '#121212',
-                            border: '#262626'
+                            red: '#DC2626',
+                            darkRed: '#991B1B',
+                            black: '#000000',
+                            cardBg: '#FFFFFF',
+                            border: '#E5E7EB',
+                            darkBorder: '#000000'
                         }
                     },
                     fontFamily: {
@@ -33,491 +34,163 @@
             }
         }
     </script>
-    
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #0A0A0A; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #FF003C; }
-        .glow-red { box-shadow: 0 0 15px rgba(255, 0, 60, 0.4); }
-        .border-red-glow { border-color: #FF003C; box-shadow: 0 0 10px rgba(255, 0, 60, 0.2); }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="h-full bg-black text-white font-sans flex flex-col justify-between select-none overflow-x-hidden">
+<body class="h-screen w-screen bg-white text-black font-sans flex flex-col justify-between overflow-hidden select-none">
 
-    <!-- Top Navigation Header -->
-    <header class="border-b border-brand-border bg-black/90 px-6 py-4 flex justify-between items-center z-40">
-        <div class="flex items-center gap-3 cursor-pointer" onclick="App.navigate('dashboard')">
-            <div class="w-8 h-8 bg-brand-red flex items-center justify-center font-bold text-black text-xl">N</div>
-            <span class="font-bold tracking-widest text-lg text-white">NEXUS <span class="text-brand-red text-xs font-mono">// IQ ENGINE</span></span>
+    <!-- Header Navigation -->
+    <header class="border-b-2 border-black bg-white px-6 py-4 flex justify-between items-center z-40">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="App.navigate('game')">
+            <div class="w-9 h-9 bg-black flex items-center justify-center font-bold text-white text-xl">N</div>
+            <span class="font-bold tracking-widest text-xl text-black">NEXUS <span class="text-brand-red text-xs font-mono">// IQ ENGINE</span></span>
         </div>
 
         <div id="nav-controls" class="hidden flex items-center gap-6">
-            <!-- Layout Switcher -->
-            <div class="flex border border-brand-border rounded bg-brand-cardBg p-1">
-                <button onclick="App.setLayout('card')" id="btn-layout-card" class="px-3 py-1 text-xs font-mono rounded bg-brand-red text-black font-bold">CARD VIEW</button>
-                <button onclick="App.setLayout('split')" id="btn-layout-split" class="px-3 py-1 text-xs font-mono rounded text-white hover:text-brand-red">SPLIT VIEW</button>
+            <!-- Dual Layout Toggle -->
+            <div class="flex border-2 border-black rounded-none bg-white p-0.5">
+                <button onclick="App.setLayout('card')" id="btn-layout-card" class="px-3 py-1 text-xs font-mono font-bold bg-black text-white">CARD VIEW</button>
+                <button onclick="App.setLayout('split')" id="btn-layout-split" class="px-3 py-1 text-xs font-mono font-bold text-black hover:text-brand-red">SPLIT VIEW</button>
             </div>
 
-            <!-- Score Badge -->
-            <div class="flex items-center gap-2 border border-brand-red/50 bg-brand-cardBg px-3 py-1 rounded">
-                <span class="text-xs font-mono text-gray-400">SCORE:</span>
-                <span id="global-score" class="text-brand-red font-mono font-bold text-sm">0 PT</span>
+            <!-- Global Score Indicator -->
+            <div class="flex items-center gap-2 border-2 border-black bg-white px-4 py-1.5 font-mono">
+                <span class="text-xs text-gray-600 uppercase font-bold">PTS:</span>
+                <span id="global-score" class="text-brand-red font-bold text-base">0 PT</span>
             </div>
 
-            <!-- User Info & Records Link -->
-            <button onclick="App.navigate('records')" class="text-xs font-mono text-white hover:text-brand-red flex items-center gap-2 border border-brand-border px-3 py-1 rounded">
-                <i class="fa-solid fa-database"></i> RECORDS
+            <!-- Navigation Links -->
+            <button onclick="App.navigate('records')" class="text-xs font-mono font-bold text-black hover:text-brand-red flex items-center gap-2 border-2 border-black px-3 py-1.5 uppercase">
+                <i class="fa-solid fa-database"></i> Records
             </button>
-            <span id="user-display" class="text-xs font-mono uppercase text-gray-400 border-l border-brand-border pl-4">--</span>
+            
+            <div class="flex items-center gap-3 border-l-2 border-black pl-4">
+                <span id="user-display" class="text-xs font-mono uppercase font-bold text-black">--</span>
+                <button onclick="Auth.logout()" class="text-xs font-mono text-brand-red hover:underline font-bold uppercase"><i class="fa-solid fa-power-off"></i></button>
+            </div>
         </div>
     </header>
 
-    <!-- Main Dynamic Content Region -->
-    <main id="app-viewport" class="flex-1 flex flex-col items-center justify-center p-4 md:p-8 relative">
+    <!-- Main View Area -->
+    <main id="app-viewport" class="flex-1 w-full h-full relative overflow-hidden">
 
-        <!-- 1. PAGINATED AUTHENTICATION ENGINE (PAGINATION QUESTIONING) -->
-        <section id="view-auth" class="w-full max-w-md bg-brand-cardBg border border-brand-border p-6 md:p-8 rounded-none glow-red">
-            <div class="mb-6 flex justify-between items-center border-b border-brand-border pb-3">
-                <span class="text-xs font-mono text-brand-red uppercase">IDENTITY VERIFICATION</span>
-                <span id="auth-page-indicator" class="text-xs font-mono text-gray-500">PAGE 1 / 3</span>
-            </div>
-
-            <!-- Auth Page 1: Codename -->
-            <div id="auth-page-1" class="auth-page">
-                <h2 class="text-xl font-bold uppercase mb-2">Establish Identity</h2>
-                <p class="text-xs text-gray-400 mb-6">Enter your designated operator codename to track scores infinite progression.</p>
-                <input id="auth-username" type="text" placeholder="OPERATOR CODENAME" class="w-full bg-black border border-brand-border p-3 text-sm font-mono text-white focus:outline-none focus:border-brand-red mb-6 uppercase">
-                <button onclick="Auth.nextPage(2)" class="w-full py-3 bg-brand-red text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition">PROCEED TO SECURITY →</button>
-            </div>
-
-            <!-- Auth Page 2: Security Assessment -->
-            <div id="auth-page-2" class="auth-page hidden">
-                <h2 class="text-xl font-bold uppercase mb-2">Cognitive Clearance</h2>
-                <p class="text-xs text-gray-400 mb-6">Answer baseline question: Which sequence breaks logical flow? (A, B, C, D)</p>
-                <div class="space-y-2 mb-6 font-mono text-xs">
-                    <button onclick="Auth.selectAnswer(this, 'A')" class="auth-opt w-full text-left p-3 border border-brand-border hover:border-brand-red bg-black">A) 2 → 4 → 8 → 16</button>
-                    <button onclick="Auth.selectAnswer(this, 'B')" class="auth-opt w-full text-left p-3 border border-brand-border hover:border-brand-red bg-black">B) 3 → 6 → 12 → 24</button>
-                    <button onclick="Auth.selectAnswer(this, 'C')" class="auth-opt w-full text-left p-3 border border-brand-border hover:border-brand-red bg-black">C) 5 → 10 → 15 → 20</button>
-                    <button onclick="Auth.selectAnswer(this, 'D')" class="auth-opt w-full text-left p-3 border border-brand-border hover:border-brand-red bg-black">D) 1 → 2 → 4 → 8</button>
+        <!-- 1. SPLIT 2-COLUMN FULLSCREEN AUTHENTICATION -->
+        <section id="view-auth" class="w-full h-full grid grid-cols-1 md:grid-cols-2">
+            <!-- Left Panel: Branding & Protocol Information -->
+            <div class="bg-black text-white p-12 flex flex-col justify-between border-r-4 border-brand-red h-full">
+                <div>
+                    <div class="inline-block px-3 py-1 bg-brand-red text-white text-xs font-mono font-bold mb-6 uppercase">SYSTEM CLEARANCE</div>
+                    <h1 class="text-5xl font-bold tracking-tight mb-4">NON-MATH<br><span class="text-brand-red">IQ EVALUATION</span></h1>
+                    <p class="text-gray-400 text-sm max-w-md leading-relaxed font-mono">
+                        Test visual logic, spatial rotations, anomaly detection, and sequence rules. Earn +20 PT per cleared level. Skipping costs -10 PT. Reaching 0 PT triggers a system knockout.
+                    </p>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="Auth.nextPage(1)" class="w-1/3 py-3 border border-brand-border text-xs font-mono text-gray-400">BACK</button>
-                    <button onclick="Auth.nextPage(3)" class="w-2/3 py-3 bg-brand-red text-black font-bold text-xs uppercase hover:bg-white transition">VERIFY & PROCEED →</button>
+                
+                <div class="border-t border-gray-800 pt-6">
+                    <div class="flex items-center gap-4 text-xs font-mono text-gray-400">
+                        <span><i class="fa-solid fa-shield-halved text-brand-red"></i> STAGE LOOPING</span>
+                        <span><i class="fa-solid fa-bolt text-brand-red"></i> NO MATH ENGINE</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Auth Page 3: Protocol Agreement -->
-            <div id="auth-page-3" class="auth-page hidden">
-                <h2 class="text-xl font-bold uppercase mb-2">Infinite Loop Authorization</h2>
-                <p class="text-xs text-gray-400 mb-6">You are entering an infinite non-mathematical spatial and visual logic loop. Every passed level grants exactly +20 PTs.</p>
-                <div class="p-3 border border-brand-border bg-black text-xs font-mono text-gray-400 mb-6">
-                    [CONFIRM] Continuous state generation enabled.<br>
-                    [CONFIRM] Score increments +20 PTs per pass.<br>
-                    [CONFIRM] No math algorithms engaged.
+            <!-- Right Panel: Interactive Authorization Form -->
+            <div class="bg-white p-12 flex flex-col justify-center items-center h-full">
+                <div class="w-full max-w-md border-2 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
+                    <div class="flex justify-between items-center border-b-2 border-black pb-3 mb-6">
+                        <span class="text-xs font-mono font-bold text-brand-red uppercase">IDENTITY ACCESS</span>
+                        <span id="auth-page-indicator" class="text-xs font-mono font-bold text-black">PAGE 1 / 2</span>
+                    </div>
+
+                    <!-- Auth Form Page 1: Codename Entry -->
+                    <div id="auth-page-1" class="auth-page">
+                        <label class="block text-xs font-mono font-bold uppercase mb-2">Operator Codename</label>
+                        <input id="auth-username" type="text" placeholder="e.g. VECTOR_01" class="w-full bg-white border-2 border-black p-3 text-sm font-mono text-black focus:outline-none focus:border-brand-red mb-6 uppercase font-bold">
+                        <button onclick="Auth.nextPage(2)" class="w-full py-3 bg-black text-white font-bold text-xs font-mono uppercase tracking-wider hover:bg-brand-red transition">PROCEED TO SECURITY KEY →</button>
+                    </div>
+
+                    <!-- Auth Form Page 2: Security Assessment -->
+                    <div id="auth-page-2" class="auth-page hidden">
+                        <label class="block text-xs font-mono font-bold uppercase mb-2">Security Verification</label>
+                        <p class="text-xs text-gray-600 mb-4 font-mono">Which geometry does not belong in standard planar space?</p>
+                        <div class="space-y-2 mb-6 font-mono text-xs">
+                            <button onclick="Auth.selectAnswer(this, 'A')" class="auth-opt w-full text-left p-3 border-2 border-black hover:bg-black hover:text-white transition font-bold">A) CIRCLE</button>
+                            <button onclick="Auth.selectAnswer(this, 'B')" class="auth-opt w-full text-left p-3 border-2 border-black hover:bg-black hover:text-white transition font-bold">B) SQUARE</button>
+                            <button onclick="Auth.selectAnswer(this, 'C')" class="auth-opt w-full text-left p-3 border-2 border-black hover:bg-black hover:text-white transition font-bold">C) HYPERCUBE</button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="Auth.nextPage(1)" class="w-1/3 py-3 border-2 border-black font-mono font-bold text-xs uppercase">BACK</button>
+                            <button onclick="Auth.complete()" class="w-1/2 flex-1 py-3 bg-brand-red text-white font-mono font-bold text-xs uppercase hover:bg-black transition">AUTHENTICATE</button>
+                        </div>
+                    </div>
                 </div>
-                <button onclick="Auth.complete()" class="w-full py-3 bg-brand-red text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition">INITIALIZE ENGINE</button>
             </div>
         </section>
 
-        <!-- 2. INFINITE IQ ENGINE VIEW -->
-        <section id="view-game" class="w-full max-w-5xl hidden flex flex-col items-center">
-            
-            <!-- Level Bar -->
-            <div class="w-full flex justify-between items-center mb-6 border-b border-brand-border pb-3">
+        <!-- 2. GAME MATRIX SECTION -->
+        <section id="view-game" class="w-full h-full hidden flex flex-col justify-between p-6 md:p-8 max-w-6xl mx-auto overflow-y-auto">
+            <!-- Stage Controls Header -->
+            <div class="flex justify-between items-center border-b-2 border-black pb-4 mb-6">
                 <div>
-                    <span class="text-xs font-mono text-brand-red uppercase">INFINITE STAGE</span>
-                    <h2 id="level-display-title" class="text-2xl font-bold uppercase">STAGE 1</h2>
+                    <span class="text-xs font-mono font-bold text-brand-red uppercase">ACTIVE STAGE EVALUATION</span>
+                    <h2 id="level-display-title" class="text-3xl font-bold uppercase tracking-tight">STAGE 1</h2>
                 </div>
-                <div class="text-right font-mono">
-                    <span class="text-xs text-gray-500">LEVEL REWARD</span>
-                    <div class="text-brand-red font-bold text-lg">+20 PT</div>
+                <div class="flex items-center gap-4">
+                    <button onclick="App.skipLevel()" class="px-4 py-2 border-2 border-brand-red bg-white text-brand-red font-mono font-bold text-xs uppercase hover:bg-brand-red hover:text-white transition">
+                        <i class="fa-solid fa-forward"></i> SKIP (-10 PT)
+                    </button>
                 </div>
             </div>
 
-            <!-- DUAL LAYOUT CONTAINER -->
-            <div id="game-layout-container" class="w-full">
-                <!-- Inner structure dynamically rendered by layout engine -->
+            <!-- Dynamic Layout Container -->
+            <div id="game-layout-container" class="flex-1 flex flex-col justify-center">
+                <!-- RENDERED BY APP.JS -->
             </div>
         </section>
 
-        <!-- 3. RECORDS KEEPING PAGE -->
-        <section id="view-records" class="w-full max-w-4xl hidden">
-            <div class="flex justify-between items-center mb-6 border-b border-brand-border pb-4">
+        <!-- 3. RECORDS KEEPING SECTION -->
+        <section id="view-records" class="w-full h-full hidden p-6 md:p-8 max-w-5xl mx-auto overflow-y-auto">
+            <div class="flex justify-between items-center border-b-2 border-black pb-4 mb-6">
                 <div>
-                    <h2 class="text-2xl font-bold uppercase">OPERATOR PERFORMANCE RECORDS</h2>
-                    <p class="text-xs text-gray-400 font-mono">Continuous log of passed levels and point accumulation.</p>
+                    <h2 class="text-3xl font-bold uppercase">PERFORMANCE RECORDS LOG</h2>
+                    <p class="text-xs text-gray-600 font-mono">Historical logging of level transitions and points allocation.</p>
                 </div>
-                <button onclick="App.navigate('game')" class="px-4 py-2 bg-brand-red text-black font-bold text-xs uppercase hover:bg-white transition">RETURN TO MATRIX</button>
+                <button onclick="App.navigate('game')" class="px-4 py-2 bg-black text-white font-mono font-bold text-xs uppercase hover:bg-brand-red transition">RETURN TO MATRIX</button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div class="bg-brand-cardBg border border-brand-border p-4">
-                    <div class="text-xs font-mono text-gray-500">TOTAL EARNED SCORE</div>
-                    <div id="record-score" class="text-3xl font-mono font-bold text-brand-red mt-1">0 PT</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <div class="text-xs font-mono font-bold text-gray-500 uppercase">CURRENT SCORE</div>
+                    <div id="record-score" class="text-4xl font-mono font-bold text-brand-red mt-2">0 PT</div>
                 </div>
-                <div class="bg-brand-cardBg border border-brand-border p-4">
-                    <div class="text-xs font-mono text-gray-500">HIGHEST STAGE REACHED</div>
-                    <div id="record-stage" class="text-3xl font-mono font-bold text-white mt-1">STAGE 1</div>
+                <div class="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <div class="text-xs font-mono font-bold text-gray-500 uppercase">HIGHEST STAGE</div>
+                    <div id="record-stage" class="text-4xl font-mono font-bold text-black mt-2">STAGE 1</div>
                 </div>
-                <div class="bg-brand-cardBg border border-brand-border p-4">
-                    <div class="text-xs font-mono text-gray-500">COMPLETED PUZZLES</div>
-                    <div id="record-count" class="text-3xl font-mono font-bold text-white mt-1">0</div>
+                <div class="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <div class="text-xs font-mono font-bold text-gray-500 uppercase">TOTAL CLEARED</div>
+                    <div id="record-count" class="text-4xl font-mono font-bold text-black mt-2">0</div>
                 </div>
             </div>
 
-            <div class="bg-brand-cardBg border border-brand-border p-4">
-                <h3 class="text-xs font-mono uppercase text-brand-red mb-4">LOG HISTORY</h3>
-                <div id="records-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar font-mono text-xs">
+            <div class="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <h3 class="text-xs font-mono font-bold uppercase text-brand-red mb-4">SYSTEM LOG HISTORY</h3>
+                <div id="records-list" class="space-y-2 max-h-60 overflow-y-auto font-mono text-xs">
                     <!-- Dynamic logs inserted here -->
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Global Footer -->
-    <footer class="border-t border-brand-border bg-black px-6 py-4 text-center text-xs font-mono text-gray-600">
-        NEXUS UNPROGRAMMABLE IQ MATRIX // NO MATH ENGINE // WHITE-BLACK-RED SPECTRA
-    </footer>
-
-    <!-- Custom Alert Overlay -->
-    <div id="custom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-        <div class="bg-brand-cardBg border border-brand-red p-6 max-w-sm w-full text-center glow-red">
-            <div id="modal-icon" class="text-3xl text-brand-red mb-3"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <p id="modal-msg" class="text-sm font-mono text-white mb-6"></p>
-            <button onclick="App.closeModal()" class="w-full py-2 bg-brand-red text-black font-bold text-xs uppercase hover:bg-white transition">ACKNOWLEDGE</button>
+    <!-- Modal Alert Overlay -->
+    <div id="custom-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white border-4 border-black p-6 max-w-sm w-full text-center shadow-[8px_8px_0px_0px_rgba(220,38,38,1)]">
+            <div id="modal-icon" class="text-4xl text-brand-red mb-3"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <p id="modal-msg" class="text-sm font-mono font-bold text-black mb-6 uppercase"></p>
+            <button onclick="App.closeModal()" class="w-full py-2 bg-black text-white font-mono font-bold text-xs uppercase hover:bg-brand-red transition">ACKNOWLEDGE</button>
         </div>
     </div>
 
-    <!-- Application Engine Logic -->
-    <script id="game-engine">
-        // Global Application State
-        const state = {
-            user: null,
-            score: 0,
-            stage: 1,
-            completedCount: 0,
-            layout: 'card', // 'card' or 'split'
-            records: [],
-            currentPuzzle: null,
-            selectedAuthAnswer: null
-        };
-
-        // Non-Math Visual & Spatial Logic IQ Challenge Generator
-        const IQEngine = {
-            shapes: ['fa-square', 'fa-circle', 'fa-triangle-exclamation', 'fa-diamond', 'fa-star', 'fa-hexagon'],
-            rotations: ['rotate-0', 'rotate-90', 'rotate-180', 'rotate-270'],
-            
-            generatePuzzle(stage) {
-                const puzzleTypes = ['SPATIAL_MATRIX', 'PATTERN_ANOMALY', 'INTERSECTION_LOGIC'];
-                const selectedType = puzzleTypes[Math.floor(Math.random() * puzzleTypes.length)];
-
-                if (selectedType === 'SPATIAL_MATRIX') {
-                    return this.generateMatrixPuzzle(stage);
-                } else if (selectedType === 'PATTERN_ANOMALY') {
-                    return this.generateAnomalyPuzzle(stage);
-                } else {
-                    return this.generateIntersectionPuzzle(stage);
-                }
-            },
-
-            generateMatrixPuzzle(stage) {
-                const baseShape = this.shapes[Math.floor(Math.random() * this.shapes.length)];
-                const correctRotationIndex = Math.floor(Math.random() * 4);
-                
-                const matrix = [
-                    { shape: baseShape, rotation: 'rotate-0' },
-                    { shape: baseShape, rotation: 'rotate-90' },
-                    { shape: baseShape, rotation: 'rotate-180' },
-                    { shape: baseShape, rotation: this.rotations[correctRotationIndex] } // The missing piece target
-                ];
-
-                const options = [
-                    { id: 'A', rotation: 'rotate-270', isCorrect: correctRotationIndex === 3 },
-                    { id: 'B', rotation: 'rotate-90', isCorrect: false },
-                    { id: 'C', rotation: 'rotate-180', isCorrect: false },
-                    { id: 'D', rotation: 'rotate-0', isCorrect: false }
-                ];
-
-                // Shuffle options
-                options.sort(() => Math.random() - 0.5);
-
-                return {
-                    type: 'SPATIAL ROTATION MATRIX',
-                    instruction: 'Identify the missing sequential pattern orientation to complete the spatial grid.',
-                    matrix: matrix,
-                    options: options,
-                    shape: baseShape
-                };
-            },
-
-            generateAnomalyPuzzle(stage) {
-                const targetShape = this.shapes[Math.floor(Math.random() * this.shapes.length)];
-                const anomalyShape = this.shapes.find(s => s !== targetShape);
-
-                const options = [
-                    { id: 'A', shape: targetShape, isCorrect: false },
-                    { id: 'B', shape: targetShape, isCorrect: false },
-                    { id: 'C', shape: anomalyShape, isCorrect: true }, // Anomaly
-                    { id: 'D', shape: targetShape, isCorrect: false }
-                ].sort(() => Math.random() - 0.5);
-
-                return {
-                    type: 'PATTERN ANOMALY DETECTION',
-                    instruction: 'Scan the geometric array. Select the structural component that breaks symbolic symmetry.',
-                    options: options,
-                    matrix: null
-                };
-            },
-
-            generateIntersectionPuzzle(stage) {
-                const shapes = [...this.shapes].sort(() => Math.random() - 0.5);
-                const target = shapes[0];
-
-                const options = [
-                    { id: 'A', shape: shapes[0], isCorrect: true },
-                    { id: 'B', shape: shapes[1], isCorrect: false },
-                    { id: 'C', shape: shapes[2], isCorrect: false },
-                    { id: 'D', shape: shapes[3], isCorrect: false }
-                ].sort(() => Math.random() - 0.5);
-
-                return {
-                    type: 'ABSTRUCT SET INTERSECTION',
-                    instruction: 'Determine which primary geometric key resolves the structural overlap sequence.',
-                    options: options,
-                    matrix: null
-                };
-            }
-        };
-
-        // Application Controller
-        const App = {
-            init() {
-                this.loadStorage();
-                this.updateUI();
-            },
-
-            loadStorage() {
-                const saved = localStorage.getItem('nexus_iq_state');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    state.user = parsed.user;
-                    state.score = parsed.score || 0;
-                    state.stage = parsed.stage || 1;
-                    state.completedCount = parsed.completedCount || 0;
-                    state.records = parsed.records || [];
-                }
-            },
-
-            saveStorage() {
-                localStorage.setItem('nexus_iq_state', JSON.stringify({
-                    user: state.user,
-                    score: state.score,
-                    stage: state.stage,
-                    completedCount: state.completedCount,
-                    records: state.records
-                }));
-            },
-
-            updateUI() {
-                document.getElementById('global-score').textContent = `${state.score} PT`;
-                if (state.user) {
-                    document.getElementById('nav-controls').classList.remove('hidden');
-                    document.getElementById('user-display').textContent = state.user;
-                }
-            },
-
-            navigate(view) {
-                document.querySelectorAll("section[id^='view-']").forEach(el => el.classList.add('hidden'));
-                document.getElementById(`view-${view}`).classList.remove('hidden');
-
-                if (view === 'game') {
-                    this.renderPuzzle();
-                } else if (view === 'records') {
-                    this.renderRecords();
-                }
-            },
-
-            setLayout(type) {
-                state.layout = type;
-                document.getElementById('btn-layout-card').className = type === 'card' 
-                    ? 'px-3 py-1 text-xs font-mono rounded bg-brand-red text-black font-bold' 
-                    : 'px-3 py-1 text-xs font-mono rounded text-white hover:text-brand-red';
-                document.getElementById('btn-layout-split').className = type === 'split' 
-                    ? 'px-3 py-1 text-xs font-mono rounded bg-brand-red text-black font-bold' 
-                    : 'px-3 py-1 text-xs font-mono rounded text-white hover:text-brand-red';
-                
-                if (!document.getElementById('view-game').classList.contains('hidden')) {
-                    this.renderPuzzle();
-                }
-            },
-
-            renderPuzzle() {
-                state.currentPuzzle = IQEngine.generatePuzzle(state.stage);
-                const container = document.getElementById('game-layout-container');
-                document.getElementById('level-display-title').textContent = `STAGE ${state.stage}`;
-                
-                const p = state.currentPuzzle;
-
-                if (state.layout === 'card') {
-                    // Single Centered Card Layout
-                    container.innerHTML = `
-                        <div class="bg-brand-cardBg border border-brand-border p-6 md:p-8 rounded-none glow-red max-w-2xl mx-auto">
-                            <div class="text-xs font-mono text-brand-red uppercase mb-2">${p.type}</div>
-                            <p class="text-sm text-gray-300 font-medium mb-6">${p.instruction}</p>
-
-                            ${p.matrix ? `
-                                <div class="grid grid-cols-2 gap-4 bg-black p-6 border border-brand-border mb-6 w-48 h-48 mx-auto">
-                                    <div class="flex items-center justify-center border border-brand-border text-brand-red text-2xl"><i class="fa-solid ${p.matrix[0].shape} ${p.matrix[0].rotation}"></i></div>
-                                    <div class="flex items-center justify-center border border-brand-border text-brand-red text-2xl"><i class="fa-solid ${p.matrix[1].shape} ${p.matrix[1].rotation}"></i></div>
-                                    <div class="flex items-center justify-center border border-brand-border text-brand-red text-2xl"><i class="fa-solid ${p.matrix[2].shape} ${p.matrix[2].rotation}"></i></div>
-                                    <div class="flex items-center justify-center border border-brand-red/80 bg-brand-red/10 text-white text-xl font-mono font-bold animate-pulse">?</div>
-                                </div>
-                            ` : ''}
-
-                            <div class="grid grid-cols-2 gap-3 font-mono">
-                                ${p.options.map((opt, idx) => `
-                                    <button onclick="App.evaluateAnswer(${opt.isCorrect})" class="p-4 bg-black border border-brand-border hover:border-brand-red flex items-center justify-center gap-3 group transition">
-                                        <span class="text-xs font-bold text-brand-red group-hover:text-white">${String.fromCharCode(65 + idx)})</span>
-                                        ${opt.rotation ? `<i class="fa-solid ${p.shape} ${opt.rotation} text-xl text-white"></i>` : ''}
-                                        ${opt.shape ? `<i class="fa-solid ${opt.shape} text-xl text-white"></i>` : ''}
-                                    </button>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    // Split Dual-Panel Layout
-                    container.innerHTML = `
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                            <!-- Panel Left: Prompt & Matrix -->
-                            <div class="bg-brand-cardBg border border-brand-border p-6 flex flex-col justify-between">
-                                <div>
-                                    <div class="text-xs font-mono text-brand-red uppercase mb-2">${p.type}</div>
-                                    <p class="text-sm text-gray-300 font-medium mb-6">${p.instruction}</p>
-                                </div>
-                                ${p.matrix ? `
-                                    <div class="grid grid-cols-2 gap-4 bg-black p-6 border border-brand-border w-48 h-48 mx-auto my-auto">
-                                        <div class="flex items-center justify-center border border-brand-border text-brand-red text-2xl"><i class="fa-solid ${p.matrix[0].shape} ${p.matrix[0].rotation}"></i></div>
-                                        <div class="flex items-center justify-center border border-brand-border text-brand-red text-2xl"><i class="fa-solid ${p.matrix[1].shape} ${p.matrix[1].rotation}"></i></div>
-                                        <div class="flex items-center justify-center border border-brand-border text-brand-red text-2xl"><i class="fa-solid ${p.matrix[2].shape} ${p.matrix[2].rotation}"></i></div>
-                                        <div class="flex items-center justify-center border border-brand-red/80 bg-brand-red/10 text-white text-xl font-mono font-bold animate-pulse">?</div>
-                                    </div>
-                                ` : '<div class="p-8 text-center text-xs font-mono text-gray-600 border border-brand-border bg-black my-auto">VISUAL ANOMALY MATRIX READY</div>'}
-                            </div>
-
-                            <!-- Panel Right: Options Selection -->
-                            <div class="bg-brand-cardBg border border-brand-border p-6 flex flex-col justify-center">
-                                <span class="text-xs font-mono text-gray-400 mb-4 block">SELECT LOGICAL RESOLUTION:</span>
-                                <div class="space-y-3 font-mono">
-                                    ${p.options.map((opt, idx) => `
-                                        <button onclick="App.evaluateAnswer(${opt.isCorrect})" class="w-full p-4 bg-black border border-brand-border hover:border-brand-red flex items-center justify-between group transition">
-                                            <span class="text-xs font-bold text-brand-red group-hover:text-white">OPTION ${String.fromCharCode(65 + idx)}</span>
-                                            ${opt.rotation ? `<i class="fa-solid ${p.shape} ${opt.rotation} text-2xl text-white"></i>` : ''}
-                                            ${opt.shape ? `<i class="fa-solid ${opt.shape} text-2xl text-white"></i>` : ''}
-                                        </button>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            },
-
-            evaluateAnswer(isCorrect) {
-                if (isCorrect) {
-                    state.score += 20; // +20 PT earned per level
-                    state.stage += 1; // Infinite unprogrammable loop level increase
-                    state.completedCount += 1;
-
-                    state.records.unshift({
-                        stage: state.stage - 1,
-                        pointsEarned: 20,
-                        totalScore: state.score,
-                        timestamp: new Date().toLocaleTimeString()
-                    });
-
-                    this.saveStorage();
-                    this.updateUI();
-                    this.showModal('STAGE CLEARED! +20 PT EARNED.', 'fa-circle-check');
-                    this.renderPuzzle();
-                } else {
-                    this.showModal('INCORRECT REASONING. TRY AGAIN.', 'fa-triangle-exclamation');
-                }
-            },
-
-            renderRecords() {
-                document.getElementById('record-score').textContent = `${state.score} PT`;
-                document.getElementById('record-stage').textContent = `STAGE ${state.stage}`;
-                document.getElementById('record-count').textContent = state.completedCount;
-
-                const list = document.getElementById('records-list');
-                if (state.records.length === 0) {
-                    list.innerHTML = `<div class="p-4 text-center text-gray-600">NO EVALUATION RECORDS LOGGED YET.</div>`;
-                    return;
-                }
-
-                list.innerHTML = state.records.map(r => `
-                    <div class="flex justify-between p-3 bg-black border border-brand-border">
-                        <span class="text-brand-red font-bold">COMPLETED STAGE ${r.stage}</span>
-                        <span class="text-white">+${r.pointsEarned} PT</span>
-                        <span class="text-gray-500">${r.timestamp}</span>
-                    </div>
-                `).join('');
-            },
-
-            showModal(msg, icon = 'fa-triangle-exclamation') {
-                document.getElementById('modal-msg').textContent = msg;
-                document.getElementById('modal-icon').innerHTML = `<i class="fa-solid ${icon}"></i>`;
-                document.getElementById('custom-modal').classList.remove('hidden');
-            },
-
-            closeModal() {
-                document.getElementById('custom-modal').classList.add('hidden');
-            }
-        };
-
-        // Paginated Authentication System
-        const Auth = {
-            currentPage: 1,
-
-            nextPage(pageNumber) {
-                if (pageNumber === 2) {
-                    const name = document.getElementById('auth-username').value.trim();
-                    if (!name) {
-                        App.showModal('PLEASE ENTER A VALID OPERATOR CODENAME.');
-                        return;
-                    }
-                    state.user = name;
-                }
-
-                document.querySelectorAll('.auth-page').forEach(el => el.classList.add('hidden'));
-                document.getElementById(`auth-page-${pageNumber}`).classList.remove('hidden');
-                document.getElementById('auth-page-indicator').textContent = `PAGE ${pageNumber} / 3`;
-                this.currentPage = pageNumber;
-            },
-
-            selectAnswer(btn, option) {
-                document.querySelectorAll('.auth-opt').forEach(el => el.classList.remove('border-brand-red', 'bg-brand-red/10'));
-                btn.classList.add('border-brand-red', 'bg-brand-red/10');
-                state.selectedAuthAnswer = option;
-            },
-
-            complete() {
-                App.saveStorage();
-                App.updateUI();
-                App.navigate('game');
-            }
-        };
-
-        // On Page Initialization
-        window.onload = () => {
-            App.init();
-            if (state.user) {
-                App.navigate('game');
-            } else {
-                App.navigate('auth');
-            }
-        };
-    </script>
+    <!-- External Modular JS -->
+    <script src="app.js"></script>
 </body>
 </html>
