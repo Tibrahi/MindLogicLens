@@ -1,4 +1,4 @@
-// IndexedDB Native Storage Wrapper
+// IndexedDB Storage Manager
 const DB = {
     dbName: 'NexusIQ_DB',
     version: 1,
@@ -72,7 +72,7 @@ const DB = {
     }
 };
 
-// Global State
+// Global App State
 const state = {
     user: null,
     score: 100,
@@ -83,10 +83,11 @@ const state = {
     layout: 'card',
     currentPuzzle: null,
     selectedAuthAnswer: null,
-    currentAuthQuestion: null
+    currentAuthQuestion: null,
+    askedQuestionIndexes: [] // Prevents repetitions
 };
 
-// Challenging Logic & General Knowledge Questions Engine
+// Mixed Question Generator Engine (No user prompt, seamless blend)
 const LogicEngine = {
     authQuestions: [
         {
@@ -98,7 +99,7 @@ const LogicEngine = {
             ]
         },
         {
-            q: "Which word continues the pattern: Apple, Banana, Cherry, Date, ______?",
+            q: "Which name continues the pattern: Apple, Banana, Cherry, Date, ______?",
             options: [
                 { text: "A) Fig", isCorrect: false },
                 { text: "B) Elderberry", isCorrect: true },
@@ -115,9 +116,10 @@ const LogicEngine = {
         }
     ],
 
-    gameQuestions: [
+    // Comprehensive question pool containing Math, Name Logic, General Knowledge & Riddles
+    questionPool: [
         {
-            title: "Name & Logical Association",
+            title: "NAME & LOGICAL ASSOCIATION",
             instruction: "Identify the entity that shares a direct logical relationship with the sequence.",
             q: "Which name does NOT fit the group: Socrates, Plato, Aristotle, Alexander, Pythagoras?",
             options: [
@@ -128,7 +130,7 @@ const LogicEngine = {
             ]
         },
         {
-            title: "General Knowledge Riddle",
+            title: "GENERAL KNOWLEDGE RIDDLE",
             instruction: "Solve the conceptual deduction puzzle.",
             q: "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?",
             options: [
@@ -139,25 +141,58 @@ const LogicEngine = {
             ]
         },
         {
-            title: "Sequential Word Logic",
-            instruction: "Determine the missing link in the alphabetical order group.",
-            q: "Alpha, Bravo, Charlie, Delta, Echo, _____?",
+            title: "MATHEMATICAL PROGRESSION",
+            instruction: "Determine the missing numerical value in the progression.",
+            q: "What comes next in the sequence: 2, 6, 12, 20, 30, ___?",
             options: [
-                { val: "Foxtrot", isCorrect: true },
-                { val: "Golf", isCorrect: false },
-                { val: "Hotel", isCorrect: false },
-                { val: "India", isCorrect: false }
+                { val: "42 (+2, +4, +6, +8, +10, +12)", isCorrect: true },
+                { val: "36", isCorrect: false },
+                { val: "40", isCorrect: false },
+                { val: "48", isCorrect: false }
             ]
         },
         {
-            title: "Lateral Deductive Reasoning",
+            title: "LATERAL DEDUCTIVE REASONING",
             instruction: "Process the situational truth matrix.",
-            q: "Electric train moves North at 60mph. Wind blows West at 10mph. Which direction does smoke travel?",
+            q: "An electric train moves North at 60mph. Wind blows West at 10mph. Which direction does smoke travel?",
             options: [
                 { val: "No smoke (Electric Train)", isCorrect: true },
                 { val: "South-West", isCorrect: false },
                 { val: "West", isCorrect: false },
                 { val: "North-West", isCorrect: false }
+            ]
+        },
+        {
+            title: "NAME ANAGRAM LOGIC",
+            instruction: "Unscramble the letters to reveal the correct category.",
+            q: "Rearrange the letters 'LISTEN' to form a word with a similar concept.",
+            options: [
+                { val: "SILENT", isCorrect: true },
+                { val: "ENLIST", isCorrect: false },
+                { val: "TINSEL", isCorrect: false },
+                { val: "INLETS", isCorrect: false }
+            ]
+        },
+        {
+            title: "MATHEMATICAL EQUIVALENCE",
+            instruction: "Find the missing operand factor that fulfills mathematical equivalence.",
+            q: "If 3x + 7 = 22, what is the value of 2x - 1?",
+            options: [
+                { val: "9", isCorrect: true },
+                { val: "7", isCorrect: false },
+                { val: "10", isCorrect: false },
+                { val: "11", isCorrect: false }
+            ]
+        },
+        {
+            title: "GENERAL SCIENCE KNOWLEDGE",
+            instruction: "Identify the element matching the chemical properties.",
+            q: "Which element is liquid at standard room temperature and pressure?",
+            options: [
+                { val: "Mercury", isCorrect: true },
+                { val: "Iron", isCorrect: false },
+                { val: "Hydrogen", isCorrect: false },
+                { val: "Sodium", isCorrect: false }
             ]
         }
     ],
@@ -166,14 +201,27 @@ const LogicEngine = {
         return this.authQuestions[Math.floor(Math.random() * this.authQuestions.length)];
     },
 
-    generatePuzzle() {
-        const p = this.gameQuestions[Math.floor(Math.random() * this.gameQuestions.length)];
-        const shuffledOpts = [...p.options].sort(() => Math.random() - 0.5);
-        return { ...p, options: shuffledOpts };
+    // Non-repeating infinite question selector
+    generateNextPuzzle() {
+        if (state.askedQuestionIndexes.length >= this.questionPool.length) {
+            state.askedQuestionIndexes = []; // Reset cycle once exhausted
+        }
+
+        let availableIndexes = this.questionPool
+            .map((_, idx) => idx)
+            .filter(idx => !state.askedQuestionIndexes.includes(idx));
+
+        let selectedIndex = availableIndexes[Math.floor(Math.random() * availableIndexes.length)];
+        state.askedQuestionIndexes.push(selectedIndex);
+
+        let puzzle = this.questionPool[selectedIndex];
+        let shuffledOpts = [...puzzle.options].sort(() => Math.random() - 0.5);
+
+        return { ...puzzle, options: shuffledOpts };
     }
 };
 
-// Global App Orchestrator
+// Global App Controller
 const App = {
     async init() {
         await DB.init();
@@ -181,7 +229,6 @@ const App = {
         await this.loadSession();
         this.updateUI();
 
-        // Register Service Worker for Offline PWA Capabilities
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(() => {});
         }
@@ -284,7 +331,7 @@ const App = {
     },
 
     renderPuzzle() {
-        state.currentPuzzle = LogicEngine.generatePuzzle();
+        state.currentPuzzle = LogicEngine.generateNextPuzzle();
         const container = document.getElementById('game-layout-container');
         document.getElementById('level-display-title').textContent = `Stage ${state.stage}`;
         
@@ -378,7 +425,6 @@ const App = {
             state.score = 0;
             await DB.addLog({ action: `Knockout (${reason})`, ptChange: -pts, timestamp: new Date().toLocaleTimeString() });
             
-            // Knockout Reset
             state.score = 100;
             state.stage = 1;
             await this.saveSession();
@@ -427,7 +473,7 @@ const App = {
     }
 };
 
-// Paginated Authentication Flow Controller
+// Paginated Authentication Controller
 const Auth = {
     nextPage(pageNumber) {
         if (pageNumber === 2) {
@@ -450,7 +496,7 @@ const Auth = {
         document.getElementById('auth-question-text').textContent = state.currentAuthQuestion.q;
 
         const container = document.getElementById('auth-options-container');
-        container.innerHTML = state.currentAuthQuestion.options.map((opt, idx) => `
+        container.innerHTML = state.currentAuthQuestion.options.map((opt) => `
             <button onclick="Auth.selectAnswer(this, ${opt.isCorrect})" class="auth-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-brand-red hover:bg-red-50/50 transition font-semibold text-slate-800">
                 ${opt.text}
             </button>
@@ -485,7 +531,7 @@ const Auth = {
     }
 };
 
-// Application Bootstrapper
+// App Initialization Bootstrapper
 window.onload = async () => {
     await App.init();
     if (state.user) {
